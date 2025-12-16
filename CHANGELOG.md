@@ -51,4 +51,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
-[1.0.0]: https://github.com/your-username/dmarc-analyzer/releases/tag/v1.0.0
+[1.0.0]: https://github.com/kuancheen/dmarc-analyzer/releases/tag/v1.0.0
