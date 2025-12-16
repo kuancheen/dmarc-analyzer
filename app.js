@@ -109,6 +109,12 @@ function saveSettings() {
         return;
     }
 
+    // Basic validation for API Key format (starts with AIza)
+    if (!apiKey.startsWith('AIza')) {
+        alert('Invalid API Key format. API Keys should start with "AIza". You might have pasted a Client Secret by mistake.');
+        return;
+    }
+
     localStorage.setItem('dmarc_client_id', clientId);
     localStorage.setItem('dmarc_api_key', apiKey);
 
@@ -124,12 +130,19 @@ async function intializeGapiClient() {
     const apiKey = localStorage.getItem('dmarc_api_key');
     if (!apiKey) return;
 
-    await gapi.client.init({
-        apiKey: apiKey,
-        discoveryDocs: [DISCOVERY_DOC],
-    });
-    gapiInited = true;
-    checkAuthStatus();
+    try {
+        await gapi.client.init({
+            apiKey: apiKey,
+            discoveryDocs: [DISCOVERY_DOC],
+        });
+        gapiInited = true;
+        checkAuthStatus();
+    } catch (error) {
+        console.error('GAPI Init Error:', error);
+        showError('Failed to initialize Google API. Please check your API Key in Settings. It may be invalid or restricted.');
+        // Force open settings if init failed to let user fix it
+        setTimeout(() => openSettings(), 1000);
+    }
 }
 
 function gisLoaded() {
