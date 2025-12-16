@@ -9,9 +9,12 @@ A beautiful, privacy-focused web application for analyzing DMARC (Domain-based M
 ## ✨ Features
 
 - **📧 Dual Input Methods**
-  - Google Drive public link support
-  - Drag-and-drop file upload
-  - Supports both ZIP and XML formats
+  - **Google Drive Integration**:
+    - Direct Google Drive API integration (requires setup)
+    - Supports public and restricted files (via Sign In)
+    - **Bulk Processing**: Analyze entire folders of ZIP files
+    - Solves CORS issues with direct file fetching
+  - **Drag-and-drop file upload**: Supports both ZIP and XML formats
 
 - **🔒 100% Privacy-Focused**
   - All processing happens entirely in your browser
@@ -77,11 +80,15 @@ php -S localhost:8000
 
 ### Method 1: Google Drive Link
 
-1. Upload your DMARC report (ZIP or XML) to Google Drive
-2. Set sharing permissions to "Anyone with the link can view"
-3. Copy the share link
-4. Paste it into the "Google Drive Link" tab
-5. Click "Analyze"
+1. **First Time Setup**:
+   - Click "⚙️ API Settings" in the top right.
+   - Enter your **Google Cloud Client ID** and **API Key**.
+   - These are saved locally in your browser.
+2. **Sign In**: Click "Sign In with Google" to authorize access.
+3. **Analyze**:
+   - Paste a link to a **File** or a **Folder**.
+   - Click "Analyze".
+   - If you paste a folder link, the app will find and process all ZIP/XML files inside it.
 
 ### Method 2: File Upload
 
@@ -186,7 +193,7 @@ See [CHANGELOG.md](CHANGELOG.md) for a list of changes.
 
 - Icons from Unicode Emoji
 - Fonts from Google Fonts
-- Libraries: JSZip, Chart.js
+- Libraries: JSZip, Chart.js, Google Drive API
 
 ## 💬 Support
 

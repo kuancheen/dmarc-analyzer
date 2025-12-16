@@ -26,6 +26,8 @@
     <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js"></script>
 </head>
 
 <body>
@@ -34,6 +36,11 @@
         <header class="header">
             <h1>📧 DMARC Report Analyzer</h1>
             <p>Analyze your DMARC reports with beautiful insights and visualizations</p>
+            <div class="header-actions">
+                <button class="btn btn-secondary btn-sm" id="settings-btn" title="Configure Google Drive API">
+                    ⚙️ API Settings
+                </button>
+            </div>
         </header>
 
         <!-- Input Section -->
@@ -55,16 +62,29 @@
 
                     <!-- Google Drive Tab -->
                     <div class="tab-content active" id="drive-tab">
-                        <div class="input-group">
-                            <input type="text" id="drive-link" class="input-field"
-                                placeholder="Paste Google Drive link (e.g., https://drive.google.com/file/d/...)">
-                            <button class="btn btn-primary" id="analyze-drive-btn">
-                                Analyze
+
+                        <!-- Auth Section (Hidden by default, shown if no token) -->
+                        <div id="auth-section" class="auth-box hidden">
+                            <p>To analyze Google Drive links properly (including folders and restricted files), please
+                                sign in.</p>
+                            <button class="btn btn-google" id="authorize-btn">
+                                <span class="icon">🔑</span> Sign In with Google
                             </button>
                         </div>
-                        <div class="message message-info">
-                            <strong>Note:</strong> Make sure your Google Drive file is set to "Anyone with the link can
-                            view"
+
+                        <!-- Drive Input Section -->
+                        <div id="drive-input-section">
+                            <div class="input-group">
+                                <input type="text" id="drive-link" class="input-field"
+                                    placeholder="Paste Google Drive link (File or Folder)">
+                                <button class="btn btn-primary" id="analyze-drive-btn">
+                                    Analyze
+                                </button>
+                            </div>
+                            <div class="message message-info">
+                                <strong>Supported:</strong> File links, Shared links, and <strong>Folder links</strong>
+                                (for multiple ZIPs).
+                            </div>
                         </div>
                     </div>
 
