@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DMARC Report Analyzer - Parse and analyze DMARC XML reports from Google Drive or file uploads. Get insights into email authentication and delivery with beautiful visualizations.">
+    <meta name="keywords" content="DMARC, email authentication, SPF, DKIM, report analyzer, email security">
+    <meta name="author" content="DMARC Analyzer">
+    
+    <title>DMARC Report Analyzer | Analyze Email Authentication Reports</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📧</text></svg>">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>📧 DMARC Report Analyzer</h1>
+            <p>Analyze your DMARC reports with beautiful insights and visualizations</p>
+        </header>
+
+        <!-- Input Section -->
+        <section class="input-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Upload Your Report</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Input Tabs -->
+                    <div class="input-tabs">
+                        <button class="tab-button active" data-tab="drive">
+                            🔗 Google Drive Link
+                        </button>
+                        <button class="tab-button" data-tab="upload">
+                            📁 File Upload
+                        </button>
+                    </div>
+
+                    <!-- Google Drive Tab -->
+                    <div class="tab-content active" id="drive-tab">
+                        <div class="input-group">
+                            <input 
+                                type="text" 
+                                id="drive-link" 
+                                class="input-field" 
+                                placeholder="Paste Google Drive link (e.g., https://drive.google.com/file/d/...)"
+                            >
+                            <button class="btn btn-primary" id="analyze-drive-btn">
+                                Analyze
+                            </button>
+                        </div>
+                        <div class="message message-info">
+                            <strong>Note:</strong> Make sure your Google Drive file is set to "Anyone with the link can view"
+                        </div>
+                    </div>
+
+                    <!-- File Upload Tab -->
+                    <div class="tab-content" id="upload-tab">
+                        <div class="drop-zone" id="drop-zone">
+                            <div class="drop-zone-icon">📦</div>
+                            <div class="drop-zone-text">Drag & Drop your file here</div>
+                            <div class="drop-zone-subtext">or click to browse (ZIP or XML files accepted)</div>
+                        </div>
+                        <input type="file" id="file-input" class="file-input" accept=".zip,.xml">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading Indicator -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Processing your DMARC report...</p>
+        </div>
+
+        <!-- Error Messages -->
+        <div id="error-container"></div>
+
+        <!-- Results Section -->
+        <section class="results-section" id="results">
+            <!-- Summary Statistics -->
+            <div class="card mb-lg">
+                <div class="card-header">
+                    <h3 class="card-title">Summary Statistics</h3>
+                    <button class="btn btn-secondary" id="export-btn">
+                        📥 Export Results
+                    </button>
+                </div>
+                <div class="stats-grid" id="stats-grid">
+                    <!-- Stats will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid mb-lg">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Authentication Results</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="auth-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Message Volume by Source</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="volume-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Records Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Detailed Records</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table id="records-table">
+                            <thead>
+                                <tr>
+                                    <th>Source IP</th>
+                                    <th>Count</th>
+                                    <th>SPF</th>
+                                    <th>DKIM</th>
+                                    <th>DMARC</th>
+                                    <th>Disposition</th>
+                                </tr>
+                            </thead>
+                            <tbody id="records-body">
+                                <!-- Rows will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Metadata -->
+            <div class="card mt-lg">
+                <div class="card-header">
+                    <h3 class="card-title">Report Information</h3>
+                </div>
+                <div class="card-body" id="metadata">
+                    <!-- Metadata will be populated by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                DMARC Report Analyzer v1.0.0 | 
+                <a href="https://github.com" target="_blank">GitHub</a> | 
+                100% Client-Side Processing - Your data never leaves your browser
+            </p>
+            <p class="text-muted" style="margin-top: 0.5rem;">
+                &copy; 2025 DMARC Analyzer. All rights reserved.
+            </p>
+        </footer>
+    </div>
+
+    <!-- Application JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
