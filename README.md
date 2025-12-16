@@ -49,13 +49,13 @@ A beautiful, privacy-focused web application for analyzing DMARC (Domain-based M
 
 ### Live Demo
 
-Visit the live application: [DMARC Analyzer](https://your-username.github.io/dmarc-analyzer)
+Visit the live application: [DMARC Analyzer](https://kuancheen.github.io/dmarc-analyzer)
 
 ### Local Development
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-username/dmarc-analyzer.git
+git clone https://github.com/kuancheen/dmarc-analyzer.git
 cd dmarc-analyzer
 ```
 
