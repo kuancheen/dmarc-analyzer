@@ -83,6 +83,23 @@ function initializeEventListeners() {
             openIpModal(ip);
         }
     });
+});
+
+// Toggle Log
+document.getElementById('log-header').addEventListener('click', toggleLog);
+
+// Global Modal Close (Click Outside & ESC)
+window.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal')) {
+        e.target.classList.add('hidden');
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal').forEach(modal => modal.classList.add('hidden'));
+    }
+});
 }
 
 
@@ -280,6 +297,9 @@ async function handleDriveAnalysis() {
     clearLog();
     addLog(`Starting analysis for link: ${link}...`);
 
+    // Ensure log is visible and expanded at start
+    setLogState(true, false); // visible=true, collapsed=false
+
     try {
         // Try to get file metadata first to determine if it's a folder or file
         const metadata = await gapi.client.drive.files.get({
@@ -442,6 +462,9 @@ async function handleFileUpload(file) {
 
     showLoading(true);
     clearError();
+    // Ensure log is visible and expanded at start
+    setLogState(true, false);
+    clearLog();
 
     try {
         let type = 'xml';
@@ -640,7 +663,7 @@ function mergeReports(reports) {
    =================================== */
 
 function analyzeData(data) {
-    const totalMessages = data.records.reduce((sum, r) => sum + r.count, 0);
+    const totalMessages = data.records.reduce((sum, r => sum + r.count), 0);
 
     let dmarcPass = 0, dmarcFail = 0, spfPass = 0, dkimPass = 0;
 
@@ -678,7 +701,6 @@ function displayResults(data) {
     renderStats(analysis);
     renderCharts(data, analysis);
     renderTable(data);
-    renderMetadata(data);
     document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -886,18 +908,20 @@ function renderIpDetails(data) {
    UI Helper Functions
    =================================== */
 
-function showLoading(show) {
-    document.getElementById('loading').classList.toggle('visible', show);
+function setLogState(visible, collapsed) {
+    const container = document.getElementById('progress-container');
+    if (!container) return;
+
+    if (visible) container.classList.remove('hidden');
+    else container.classList.add('hidden');
+
+    if (collapsed) container.classList.add('collapsed');
+    else container.classList.remove('collapsed');
 }
 
-function showError(message) {
-    const errorContainer = document.getElementById('error-container');
-    if (errorContainer) {
-        errorContainer.innerHTML = `<div class="message message-error"><strong>Error:</strong> ${message}</div>`;
-        errorContainer.scrollIntoView({ behavior: 'smooth' });
-    }
-    // Ensure loading is hidden on error
-    showLoading(false);
+function toggleLog() {
+    const container = document.getElementById('progress-container');
+    container.classList.toggle('collapsed');
 }
 
 function clearError() {
@@ -905,12 +929,15 @@ function clearError() {
 }
 
 function clearLog() {
-    const log = document.getElementById('progress-log');
+    const log = document.getElementById('loading'); // ID reused for log content to minimize change, no, wait... 
+    // In index.html step, I renamed the content div to id="loading" class="log-content". 
+    // And duplicate id="loading" was removed from top. 
+    // So "loading" is now the log content container. Correct.
     if (log) log.innerHTML = '';
 }
 
 function addLog(message, type = 'info') {
-    const logContainer = document.getElementById('progress-log');
+    const logContainer = document.getElementById('loading'); // "loading" is indeed the content div now
     if (!logContainer) return;
     const entry = document.createElement('div');
     entry.className = `log-entry log-${type}`;
