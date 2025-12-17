@@ -2,7 +2,7 @@
 
 A beautiful, privacy-focused web application for analyzing DMARC (Domain-based Message Authentication, Reporting & Conformance) reports. Parse email authentication data from Google Drive links or direct file uploads and gain actionable insights with stunning visualizations.
 
-![Version](https://img.shields.io/badge/version-1.4.2-blue.svg)
+![Version](https://img.shields.io/badge/version-1.4.3-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Privacy](https://img.shields.io/badge/privacy-100%25%20client--side-success.svg)
 

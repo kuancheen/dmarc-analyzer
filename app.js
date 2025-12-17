@@ -292,7 +292,6 @@ async function handleDriveAnalysis() {
         return;
     }
 
-    showLoading(true);
     clearError();
     clearLog();
     addLog(`Starting analysis for link: ${link}...`);
@@ -321,8 +320,9 @@ async function handleDriveAnalysis() {
         let errorMsg = error.message || (error.result && error.result.error && error.result.error.message);
         showError(`Error accessing Google Drive: ${errorMsg || 'Unknown error'}`);
     } finally {
-        showLoading(false);
+        setLogState(true, true); // visible=true, collapsed=true (auto-collapse on finish)
     }
+}
 }
 
 function extractDriveId(url) {
@@ -460,7 +460,6 @@ async function handleFileUpload(file) {
         return;
     }
 
-    showLoading(true);
     clearError();
     // Ensure log is visible and expanded at start
     setLogState(true, false);
@@ -479,8 +478,9 @@ async function handleFileUpload(file) {
     } catch (error) {
         showError(`Error processing file: ${error.message}`);
     } finally {
-        showLoading(false);
+        setLogState(true, true); // visible=true, collapsed=true
     }
+}
 }
 
 /* ===================================
