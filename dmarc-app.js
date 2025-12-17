@@ -723,6 +723,7 @@ function displayResults(data) {
     const analysis = analyzeData(data);
     document.getElementById('results').classList.add('visible');
     renderStats(analysis);
+    renderSummary(data, analysis); // New Smart Summary
     renderCharts(data, analysis);
     renderTable(data);
     document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
@@ -832,6 +833,95 @@ function renderMetadata(data) {
         <p><strong>DKIM Alignment:</strong> ${data.policy.adkim === 'r' ? 'Relaxed' : 'Strict'}</p>
         <p><strong>SPF Alignment:</strong> ${data.policy.aspf === 'r' ? 'Relaxed' : 'Strict'}</p>
     `;
+}
+
+/* ===================================
+   Smart Summary (Heuristic Engine)
+   =================================== */
+
+function generateSmartSummary(data, analysis) {
+    const findings = [];
+    const recommendations = [];
+    const policy = data.policy;
+
+    // 1. Pass Rate Analysis
+    const passRate = parseFloat(analysis.dmarcPassRate);
+    if (passRate < 50) {
+        findings.push({ type: 'critical', text: `Critical DMARC Pass Rate: Only ${passRate}% of emails are authenticated.` });
+        recommendations.push('Immediate investigation required. Large volume of legitimate mail may be failing, or domain is being spoofed.');
+    } else if (passRate < 90) {
+        findings.push({ type: 'warning', text: `Low DMARC Pass Rate: ${passRate}% (Industry target is >95%).` });
+    } else {
+        findings.push({ type: 'success', text: `High DMARC Pass Rate: ${passRate}%. System appears healthy.` });
+    }
+
+    // 2. Policy Mode Review
+    if (policy.p === 'none') {
+        findings.push({ type: 'info', text: 'Domain is in "Monitoring Mode" (p=none). No unauthenticated emails are rejected.' });
+        recommendations.push('Once pass rates are consistently high (>95%), consider moving policy to "quarantine" or "reject" to stop spoofing.');
+    } else if (policy.p === 'quarantine') {
+        findings.push({ type: 'info', text: 'Domain is in "Quarantine Mode". Suspicious emails are sent to spam.' });
+        if (passRate > 95) recommendations.push('System is stable. Consider moving to "p=reject" for maximum protection.');
+    } else if (policy.p === 'reject') {
+        findings.push({ type: 'success', text: 'Domain is in "Reject Mode". Maximum protection active.' });
+    }
+
+    // 3. Alignment Issues
+    if (parseFloat(analysis.spfPassRate) < 80) {
+        findings.push({ type: 'warning', text: `SPF Alignment is low (${analysis.spfPassRate}%). Many sources are failing SPF checks.` });
+        recommendations.push('Review SPF record (TXT) in DNS. Ensure all valid senders (Mailchimp, Google, etc.) are included.');
+    }
+    if (parseFloat(analysis.dkimPassRate) < 80) {
+        findings.push({ type: 'warning', text: `DKIM Alignment is low (${analysis.dkimPassRate}%). Emails may be missing valid signatures.` });
+        recommendations.push('Verify DKIM keys are correctly rotated and published for all sending services.');
+    }
+
+    // 4. Top Offenders
+    const failedRecords = data.records.filter(r => {
+        const passed = r.policyEvaluated.dkim === 'pass' || r.policyEvaluated.spf === 'pass';
+        return !passed;
+    });
+
+    if (failedRecords.length > 0) {
+        // Sort by count desc
+        failedRecords.sort((a, b) => b.count - a.count);
+        const topOffender = failedRecords[0];
+        findings.push({ type: 'warning', text: `Top Failure Source: IP ${topOffender.sourceIp} sent ${topOffender.count} failing emails.` });
+        recommendations.push(`Check IP ${topOffender.sourceIp} (Top Offender). If it is legitimate, authorize it in your SPF/DKIM settings.`);
+    }
+
+    return { findings, recommendations };
+}
+
+function renderSummary(data, analysis) {
+    const summaryCard = document.getElementById('summary-card');
+    if (!summaryCard) return;
+
+    const summary = generateSmartSummary(data, analysis);
+    const findingsList = document.getElementById('summary-findings');
+    const actionsList = document.getElementById('summary-actions');
+
+    // Create finding items
+    findingsList.innerHTML = summary.findings.map(f => {
+        let icon = 'ℹ️';
+        if (f.type === 'critical') icon = '🚨';
+        else if (f.type === 'warning') icon = '⚠️';
+        else if (f.type === 'success') icon = '✅';
+
+        return `<li class="summary-item ${f.type}"><span class="icon">${icon}</span> ${f.text}</li>`;
+    }).join('');
+
+    // Create action items
+    if (summary.recommendations.length > 0) {
+        actionsList.innerHTML = summary.recommendations.map(r =>
+            `<li class="summary-item action"><span class="icon">💡</span> ${r}</li>`
+        ).join('');
+    } else {
+        actionsList.innerHTML = '<li class="summary-item info"><span class="icon">👍</span> No immediate actions required.</li>';
+    }
+
+    // Show card
+    summaryCard.classList.remove('hidden');
 }
 
 /* ===================================

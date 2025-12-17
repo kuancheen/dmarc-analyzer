@@ -565,6 +565,74 @@ tbody tr:last-child td {
 }
 
 /* ===================================
+   Smart Summary (v1.5.0)
+   =================================== */
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+}
+
+@media (max-width: 768px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summary-section h4 {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  margin-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: var(--spacing-xs);
+}
+
+.summary-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.summary-item {
+  margin-bottom: var(--spacing-sm);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+
+.summary-item .icon {
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+/* Finding Types */
+.summary-item.critical {
+  color: #ff5252;
+  font-weight: 600;
+}
+
+.summary-item.warning {
+  color: #ffd740;
+}
+
+.summary-item.success {
+  color: #69f0ae;
+}
+
+.summary-item.info {
+  color: var(--text-primary);
+}
+
+.summary-item.action {
+  color: #4facfe;
+}
+
+/* ===================================
    Loading & Messages
    =================================== */
 
