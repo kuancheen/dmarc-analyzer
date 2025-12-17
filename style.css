@@ -867,3 +867,63 @@ tbody tr:last-child td {
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
+
+/* ===================================
+   Progress Log
+   =================================== */
+
+.progress-log {
+  margin-top: var(--spacing-md);
+  max-height: 250px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm);
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: var(--font-size-sm);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+}
+
+.log-entry {
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.log-entry:last-child {
+  border-bottom: none;
+}
+
+.log-timestamp {
+  color: var(--text-muted);
+  margin-right: 8px;
+  font-size: 0.8em;
+}
+
+.log-info {
+  color: var(--text-secondary);
+}
+
+.log-success {
+  color: #43e97b;
+}
+
+.log-warning {
+  color: #feac5e;
+}
+
+.log-error {
+  color: #ff6b6b;
+}
+
+.log-metadata {
+  display: block;
+  margin-left: 20px;
+  margin-top: 2px;
+  font-size: 0.85em;
+  color: var(--text-muted);
+  font-style: italic;
+}

@@ -263,6 +263,8 @@ async function handleDriveAnalysis() {
 
     showLoading(true);
     clearError();
+    clearLog();
+    addLog(`Starting analysis for link: ${link}...`);
 
     try {
         // Try to get file metadata first to determine if it's a folder or file
@@ -307,6 +309,7 @@ function extractDriveId(url) {
 }
 
 async function processDriveFolder(folderId) {
+    addLog(`Scanning folder ID: ${folderId}...`);
     // mimeType = 'application/x-gzip' is often used for .gz files
     const query = `'${folderId}' in parents and (mimeType = 'application/zip' or mimeType = 'application/x-gzip' or mimeType = 'application/gzip' or mimeType = 'text/xml' or name contains '.xml' or name contains '.zip' or name contains '.gz') and trashed = false`;
 
@@ -323,18 +326,22 @@ async function processDriveFolder(folderId) {
             includeItemsFromAllDrives: true
         });
 
+        addLog(`Found ${response.result.files.length} potential files in this batch...`);
         files = files.concat(response.result.files);
         pageToken = response.result.nextPageToken;
     } while (pageToken);
 
     if (files.length === 0) {
+        addLog('No ZIP, GZIP, or XML files found.', 'warning');
         throw new Error('No ZIP or XML files found in this folder.');
     }
 
+    addLog(`Total files to process: ${files.length}`);
     let allReports = [];
 
-    for (const file of files) {
+    for (const [index, file] of files.entries()) {
         try {
+            addLog(`Processing file ${index + 1}/${files.length}: ${file.name} (${file.mimeType})`);
             const fileContent = await fetchDriveFileContent(file.id);
             const fileName = file.name.toLowerCase();
             let type = 'xml';
@@ -348,6 +355,7 @@ async function processDriveFolder(folderId) {
             allReports = allReports.concat(fileReports);
         } catch (e) {
             console.error(`Skipping file ${file.name}:`, e);
+            addLog(`Skipped ${file.name}: ${e.message}`, 'error');
         }
     }
 
@@ -360,6 +368,7 @@ async function processDriveFolder(folderId) {
 }
 
 async function processDriveFile(fileId, fileName) {
+    addLog(`Fetching single file: ${fileName}...`);
     const content = await fetchDriveFileContent(fileId);
     const name = fileName.toLowerCase();
 
@@ -444,6 +453,8 @@ async function handleFileUpload(file) {
 async function processContent(input, type, sourceName) {
     let xmlFiles = [];
 
+    addLog(`Extracting content from ${sourceName} (${type})...`);
+
     if (type === 'zip') {
         const zip = await JSZip.loadAsync(input);
         const xmlFileNames = Object.keys(zip.files).filter(name =>
@@ -452,17 +463,23 @@ async function processContent(input, type, sourceName) {
 
         if (xmlFileNames.length === 0) {
             console.warn(`No XML files found in ZIP: ${sourceName}`);
+            addLog(`No XML files found inside ZIP: ${sourceName}`, 'warning');
             return [];
         }
+
+        addLog(`Found ${xmlFileNames.length} XML file(s) in ZIP.`);
 
         for (const fileName of xmlFileNames) {
             const content = await zip.files[fileName].async('text');
             xmlFiles.push({ name: fileName, content });
+            addLog(`Extracted: ${fileName}`);
         }
     } else if (type === 'gzip') {
         try {
+            addLog('Decompressing GZIP...');
             const content = await decompressGzip(input);
             xmlFiles.push({ name: sourceName, content });
+            addLog('Decompression successful.', 'success');
         } catch (e) {
             console.error('GZIP Decompression failed:', e);
             throw new Error(`Failed to decompress GZIP file: ${sourceName}`);
@@ -480,15 +497,21 @@ async function processContent(input, type, sourceName) {
 
     const reports = [];
     for (const xmlFile of xmlFiles) {
-        try {
-            const report = parseDmarcXml(xmlFile.content);
-            reports.push(report);
-        } catch (error) {
-            console.error(`Error parsing ${xmlFile.name}:`, error);
-        }
-    }
+        const report = parseDmarcXml(xmlFile.content);
+        reports.push(report);
 
-    return reports;
+        // LOGGING METADATA AS REQUESTED
+        const meta = report.metadata;
+        const dateRange = `${meta.dateBegin.toLocaleDateString()} - ${meta.dateEnd.toLocaleDateString()}`;
+        addLog(`Parsed: ${xmlFile.name}<br><span class="log-metadata">Org: ${meta.orgName} | ID: ${meta.reportId} | Period: ${dateRange}</span>`, 'success');
+
+    } catch (error) {
+        console.error(`Error parsing ${xmlFile.name}:`, error);
+        addLog(`Failed to parse XML ${xmlFile.name}: ${error.message}`, 'error');
+    }
+}
+
+return reports;
 }
 
 async function decompressGzip(blob) {
@@ -786,12 +809,25 @@ function showLoading(show) {
     document.getElementById('loading').classList.toggle('visible', show);
 }
 
-function showError(message) {
-    const errorContainer = document.getElementById('error-container');
-    errorContainer.innerHTML = `<div class="message message-error"><strong>Error:</strong> ${message}</div>`;
-    errorContainer.scrollIntoView({ behavior: 'smooth' });
+errorContainer.scrollIntoView({ behavior: 'smooth' });
 }
 
 function clearError() {
     document.getElementById('error-container').innerHTML = '';
+}
+
+function clearLog() {
+    const log = document.getElementById('progress-log');
+    if (log) log.innerHTML = '';
+}
+
+function addLog(message, type = 'info') {
+    const logContainer = document.getElementById('progress-log');
+    if (!logContainer) return;
+    const entry = document.createElement('div');
+    entry.className = `log-entry log-${type}`;
+    const timestamp = new Date().toLocaleTimeString([], { hour12: false });
+    entry.innerHTML = `<span class="log-timestamp">[${timestamp}]</span> ${message}`;
+    logContainer.appendChild(entry);
+    logContainer.scrollTop = logContainer.scrollHeight;
 }
