@@ -323,7 +323,7 @@ async function handleDriveAnalysis() {
         setLogState(true, true); // visible=true, collapsed=true (auto-collapse on finish)
     }
 }
-}
+
 
 function extractDriveId(url) {
     const patterns = [
@@ -481,7 +481,7 @@ async function handleFileUpload(file) {
         setLogState(true, true); // visible=true, collapsed=true
     }
 }
-}
+
 
 /* ===================================
    Core Processing Logic (Shared)

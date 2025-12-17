@@ -5,6 +5,11 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.4] - 2025-12-17
+
+### Fixed
+- **Hotfix**: Fixed `SyntaxError: Unexpected token '}'`. Removed stray closing braces that were accidentally introduced while fixing the `showLoading` reference error.
+
 ## [1.4.3] - 2025-12-17
 
 ### Fixed
@@ -157,6 +162,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.4.4]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.3...v1.4.4
 [1.4.3]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.2...v1.4.3
 [1.4.2]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.0...v1.4.1
