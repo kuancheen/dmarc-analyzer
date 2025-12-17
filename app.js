@@ -509,17 +509,19 @@ function initializeEventListeners() {
 
         const reports = [];
         for (const xmlFile of xmlFiles) {
-            const report = parseDmarcXml(xmlFile.content);
-            reports.push(report);
+            try {
+                const report = parseDmarcXml(xmlFile.content);
+                reports.push(report);
 
-            // LOGGING METADATA AS REQUESTED
-            const meta = report.metadata;
-            const dateRange = `${meta.dateBegin.toLocaleDateString()} - ${meta.dateEnd.toLocaleDateString()}`;
-            addLog(`Parsed: ${xmlFile.name}<br><span class="log-metadata">Org: ${meta.orgName} | ID: ${meta.reportId} | Period: ${dateRange}</span>`, 'success');
+                // LOGGING METADATA AS REQUESTED
+                const meta = report.metadata;
+                const dateRange = `${meta.dateBegin.toLocaleDateString()} - ${meta.dateEnd.toLocaleDateString()}`;
+                addLog(`Parsed: ${xmlFile.name}<br><span class="log-metadata">Org: ${meta.orgName} | ID: ${meta.reportId} | Period: ${dateRange}</span>`, 'success');
 
-        } catch (error) {
-            console.error(`Error parsing ${xmlFile.name}:`, error);
-            addLog(`Failed to parse XML ${xmlFile.name}: ${error.message}`, 'error');
+            } catch (error) {
+                console.error(`Error parsing ${xmlFile.name}:`, error);
+                addLog(`Failed to parse XML ${xmlFile.name}: ${error.message}`, 'error');
+            }
         }
     }
 
