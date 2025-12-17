@@ -21,7 +21,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="dmarc-style.css?v=1.5.1">
+    <link rel="stylesheet" href="dmarc-style.css?v=1.5.2">
 
     <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -108,6 +108,29 @@
 
         <!-- Results Section -->
         <section class="results-section" id="results">
+            <!-- Smart Summary Card (v1.5.2) -->
+            <div id="summary-card" class="card mb-lg hidden">
+                <div class="card-header">
+                    <h3 class="card-title">🤖 Smart Analysis & Recommendations</h3>
+                </div>
+                <div class="card-body">
+                    <div class="summary-grid">
+                        <div class="summary-section">
+                            <h4 class="summary-header">Key Findings</h4>
+                            <ul id="summary-findings" class="summary-list">
+                                <!-- Injected by JS -->
+                            </ul>
+                        </div>
+                        <div class="summary-section">
+                            <h4 class="summary-header">Recommended Actions</h4>
+                            <ul id="summary-actions" class="summary-list">
+                                <!-- Injected by JS -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Summary Statistics -->
             <div class="card mb-lg">
                 <div class="card-header">
@@ -191,7 +214,7 @@
         <!-- Footer -->
         <footer class="footer">
             <p>
-                DMARC Report Analyzer v1.5.1 |
+                DMARC Report Analyzer v1.5.2 |
                 <a href="https://github.com" target="_blank">GitHub</a> |
                 100% Client-Side Processing - Your data never leaves your browser
             </p>
@@ -202,7 +225,7 @@
     </div>
 
     <!-- Application JavaScript -->
-    <script src="dmarc-app.js?v=1.5.1"></script>
+    <script src="dmarc-app.js?v=1.5.2"></script>
     <!-- Settings Modal -->
     <div id="settings-modal" class="modal hidden">
         <div class="modal-content card">
