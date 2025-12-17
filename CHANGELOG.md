@@ -5,6 +5,12 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.9] - 2025-12-17
+
+### Fixed
+- **Critical UX**: Moved the `resetUIForAnalysis()` call in the File Upload handler to execute *before* the file is read. This ensures the Processing Log appears immediately, rather than waiting for large files to load.
+- **Critical UI**: Implemented the "Nuclear Option" for Log Visibility. The `resetUIForAnalysis` function now explicitly sets `display: block` on the log container, overriding any conflicting CSS class specificity or states.
+
 ## [1.5.8] - 2025-12-17
 
 ### Fixed
@@ -256,6 +262,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.5.9]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.8...v1.5.9
 [1.5.8]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.7...v1.5.8
 [1.5.7]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.6...v1.5.7
 [1.5.6]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.5...v1.5.6

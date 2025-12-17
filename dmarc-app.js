@@ -478,13 +478,18 @@ async function handleFileUpload(file) {
         return;
     }
 
+    // Reset UI: Hide results, show log, force repaint IMMEDIATELY
+    // This ensures feedback is shown even while large files are read into memory
+    await resetUIForAnalysis();
+    clearError();
+    clearLog();
+    addLog(`Reading file: ${fileName}...`); // Show log before read starts
+
     const reader = new FileReader();
 
     reader.onload = async function (e) {
-        // Reset UI: Hide results, show log, force repaint
         try {
-            await resetUIForAnalysis();
-            addLog(`Analyzing uploaded file: ${fileName}...`);
+            addLog(`Analyzing content...`);
             // Force repaint again just in case
             await new Promise(r => setTimeout(r, 50));
 
@@ -1108,6 +1113,10 @@ async function resetUIForAnalysis() {
     if (logContainer) {
         logContainer.classList.remove('hidden');
         logContainer.classList.remove('collapsed');
+
+        // NUCLEAR OPTION: Force display style to block to override any CSS specificity issues
+        logContainer.style.display = 'block';
+
         // Reset arrow rotation
         const arrow = document.getElementById('log-toggle-icon');
         if (arrow) arrow.style.transform = 'rotate(0deg)';
