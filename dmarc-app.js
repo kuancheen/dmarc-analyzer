@@ -1090,18 +1090,27 @@ function addLog(message, type = 'info') {
 }
 
 async function resetUIForAnalysis() {
-    // Hide all result cards
-    document.getElementById('stats-card').classList.add('hidden');
-    document.getElementById('charts-section').classList.add('hidden');
-    document.getElementById('detailed-records-card').classList.add('hidden');
-    document.getElementById('summary-card').classList.add('hidden');
+    // Hide all result cards explicitly
+    const cards = [
+        'stats-card',
+        'charts-section',
+        'detailed-records-card',
+        'summary-card'
+    ];
+
+    cards.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+    });
 
     // Show Log Container and expand it
     const logContainer = document.getElementById('progress-container');
     if (logContainer) {
         logContainer.classList.remove('hidden');
         logContainer.classList.remove('collapsed');
-        document.getElementById('log-toggle-icon').style.transform = 'rotate(0deg)';
+        // Reset arrow rotation
+        const arrow = document.getElementById('log-toggle-icon');
+        if (arrow) arrow.style.transform = 'rotate(0deg)';
     }
 
     // Force browser repaint (yield to main thread)

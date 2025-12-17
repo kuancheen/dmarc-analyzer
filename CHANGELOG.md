@@ -5,6 +5,11 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.8] - 2025-12-17
+
+### Fixed
+- **UI**: Refined `resetUIForAnalysis` to be robust against missing elements and ensure the Processing Log is forced open (`collapsed` removed) and visible (`hidden` removed) immediately upon analysis start.
+
 ## [1.5.7] - 2025-12-17
 
 ### Fixed
@@ -251,6 +256,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.5.8]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.7...v1.5.8
 [1.5.7]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.6...v1.5.7
 [1.5.6]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.5...v1.5.6
 [1.5.5]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.4...v1.5.5
