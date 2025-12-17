@@ -5,6 +5,13 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.9] - 2025-12-17
+
+### Changed
+- **UX**: Log entries are now prepended (newest on top) instead of appended, so you always see the latest action first.
+- **UX**: The Log Card is now completely hidden until an analysis starts.
+- **UI**: Improved zebra striping contrast in the log (alternating dark/lighter rows) for better readability.
+
 ## [1.4.8] - 2025-12-17
 
 ### Fixed
@@ -190,6 +197,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.4.9]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.8...v1.4.9
 [1.4.8]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.7...v1.4.8
 [1.4.7]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.6...v1.4.7
 [1.4.6]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.5...v1.4.6

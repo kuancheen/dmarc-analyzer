@@ -977,6 +977,9 @@ function addLog(message, type = 'info') {
     entry.className = `log-entry log-${type}`;
     const timestamp = new Date().toLocaleTimeString([], { hour12: false });
     entry.innerHTML = `<span class="log-timestamp">[${timestamp}]</span> ${message}`;
-    logContainer.appendChild(entry);
-    logContainer.scrollTop = logContainer.scrollHeight;
+
+    // User requested reverse order (newest on top)
+    logContainer.prepend(entry);
+    // No need to scroll to bottom since we are prepending to top
+    logContainer.scrollTop = 0;
 }

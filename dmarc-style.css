@@ -927,13 +927,20 @@ tbody tr:last-child td {
     overflow: hidden;
   }
 
-  /* Zebra striping for logs */
+  /* Zebra striping for logs (High Contrast) */
   .log-entry:nth-child(even) {
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: rgba(0, 0, 0, 0.3);
+    /* Darker row */
+  }
+
+  .log-entry:nth-child(odd) {
+    background-color: rgba(255, 255, 255, 0.02);
+    /* Slightly lighter row */
   }
 
   .log-entry:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.1);
+    /* Highlight on hover */
   }
 
   .arrow {
