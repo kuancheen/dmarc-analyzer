@@ -21,7 +21,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="dmarc-style.css?v=1.5.6">
+    <link rel="stylesheet" href="dmarc-style.css?v=1.5.7">
 
     <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -111,7 +111,7 @@
 
 
             <!-- Summary Statistics -->
-            <div class="card mb-lg">
+            <div id="stats-card" class="card mb-lg hidden">
                 <div class="card-header">
                     <h3 class="card-title">Summary Statistics</h3>
                     <button class="btn btn-secondary" id="export-btn">
@@ -124,7 +124,7 @@
             </div>
 
             <!-- Charts -->
-            <div class="charts-grid mb-lg">
+            <div id="charts-section" class="charts-grid mb-lg hidden">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Authentication Results</h3>
@@ -149,7 +149,7 @@
             </div>
 
             <!-- Detailed Records Table -->
-            <div class="card">
+            <div id="detailed-records-card" class="card hidden">
                 <div class="card-header">
                     <h3 class="card-title">Detailed Records</h3>
                 </div>
@@ -219,7 +219,7 @@
         <!-- Footer -->
         <footer class="footer">
             <p>
-                DMARC Report Analyzer v1.5.6 |
+                DMARC Report Analyzer v1.5.7 |
                 <a href="https://github.com" target="_blank">GitHub</a> |
                 100% Client-Side Processing - Your data never leaves your browser
             </p>
@@ -229,7 +229,7 @@
         </footer>
 
         <!-- Application JavaScript -->
-        <script src="dmarc-app.js?v=1.5.6"></script>
+        <script src="dmarc-app.js?v=1.5.7"></script>
         <!-- Settings Modal -->
         <div id="settings-modal" class="modal hidden">
             <div class="modal-content card">

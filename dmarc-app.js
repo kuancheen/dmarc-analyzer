@@ -313,12 +313,9 @@ async function handleDriveAnalysis() {
         return;
     }
 
-    clearError();
-    clearLog();
+    // Reset UI: Hide results, show log, force repaint
+    await resetUIForAnalysis();
     addLog(`Starting analysis for link: ${link}...`);
-
-    // Ensure log is visible and expanded at start
-    setLogState(true, false); // visible=true, collapsed=false
 
     try {
         // Try to get file metadata first to determine if it's a folder or file
@@ -481,26 +478,30 @@ async function handleFileUpload(file) {
         return;
     }
 
-    clearError();
-    // Ensure log is visible and expanded at start
-    setLogState(true, false);
-    clearLog();
+    const reader = new FileReader();
 
-    try {
-        let type = 'xml';
-        if (isZip) type = 'zip';
-        else if (isGzip) type = 'gzip';
+    reader.onload = async function (e) {
+        // Reset UI: Hide results, show log, force repaint
+        try {
+            await resetUIForAnalysis();
+            addLog(`Analyzing uploaded file: ${fileName}...`);
+            // Force repaint again just in case
+            await new Promise(r => setTimeout(r, 50));
 
-        const reports = await processContent(file, type, fileName);
-        if (reports.length === 0) throw new Error('No valid reports found');
+            const reports = await processContent(e.target.result, isZip ? 'zip' : (isGzip ? 'gzip' : 'xml'), file.name);
 
-        dmarcData = reports.length === 1 ? reports[0] : mergeReports(reports);
-        displayResults(dmarcData);
-    } catch (error) {
-        showError(`Error processing file: ${error.message}`);
-    } finally {
-        setLogState(true, true); // visible=true, collapsed=true
-    }
+            if (reports.length === 0) throw new Error('No valid reports found.');
+            dmarcData = reports.length === 1 ? reports[0] : mergeReports(reports);
+            displayResults(dmarcData);
+        } catch (error) {
+            console.error('File Processing Error:', error);
+            showError(`Error processing file: ${error.message}`);
+        } finally {
+            setLogState(true, true); // visible=true, collapsed=true
+        }
+    };
+
+    reader.readAsArrayBuffer(file); // Read as ArrayBuffer for JSZip/Gzip
 }
 
 
@@ -692,7 +693,7 @@ function mergeReports(reports) {
    =================================== */
 
 function analyzeData(data) {
-    const totalMessages = data.records.reduce((sum, r) => sum + r.count, 0);
+    const totalMessages = data.records.reduce((sum, r => sum + r.count, 0);
 
     let dmarcPass = 0, dmarcFail = 0, spfPass = 0, dkimPass = 0;
 
@@ -727,6 +728,14 @@ function analyzeData(data) {
 function displayResults(data) {
     if (!data || !data.records) return;
     const analysis = analyzeData(data);
+
+    // Show all result containers
+    document.getElementById('stats-card').classList.remove('hidden');
+    document.getElementById('charts-section').classList.remove('hidden');
+    document.getElementById('detailed-records-card').classList.remove('hidden');
+    // summary-card visibility is handled dynamically inside generateSmartSummary but we can ensure container is ready
+    // Actually generateSmartSummary toggles its own hidden state.
+
     document.getElementById('results').classList.add('visible');
     renderStats(analysis);
     renderSummary(data, analysis); // New Smart Summary
@@ -1078,4 +1087,23 @@ function addLog(message, type = 'info') {
     logContainer.prepend(entry);
     // No need to scroll to bottom since we are prepending to top
     logContainer.scrollTop = 0;
+}
+
+async function resetUIForAnalysis() {
+    // Hide all result cards
+    document.getElementById('stats-card').classList.add('hidden');
+    document.getElementById('charts-section').classList.add('hidden');
+    document.getElementById('detailed-records-card').classList.add('hidden');
+    document.getElementById('summary-card').classList.add('hidden');
+
+    // Show Log Container and expand it
+    const logContainer = document.getElementById('progress-container');
+    if (logContainer) {
+        logContainer.classList.remove('hidden');
+        logContainer.classList.remove('collapsed');
+        document.getElementById('log-toggle-icon').style.transform = 'rotate(0deg)';
+    }
+
+    // Force browser repaint (yield to main thread)
+    await new Promise(resolve => setTimeout(resolve, 50));
 }

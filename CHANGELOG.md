@@ -5,6 +5,12 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.7] - 2025-12-17
+
+### Fixed
+- **UX**: Solved the issue where the Processing Log wouldn't appear until analysis was finished. Implemented `resetUIForAnalysis()` with an async delay to force the browser to repaint *before* heavy processing starts.
+- **UX**: Analysis Flow is now cleaner: when you click "Analyse", all previous result cards (Stats, Charts, Records) are immediately hidden, showing *only* the expanding Progress Log. Results reappear only upon success.
+
 ## [1.5.6] - 2025-12-17
 
 ### Fixed
@@ -245,6 +251,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.5.7]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.6...v1.5.7
 [1.5.6]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.5...v1.5.6
 [1.5.5]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.4...v1.5.5
 [1.5.4]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.3...v1.5.4
