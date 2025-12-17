@@ -577,11 +577,11 @@ function parseDmarcXml(xmlString) {
     }
 
     const metadata = {
-        orgName: getXmlValue(xmlDoc, 'org_name'),
+        orgName: getXmlValue(xmlDoc, 'org_name') || 'Unknown Org',
         email: getXmlValue(xmlDoc, 'email'),
         reportId: getXmlValue(xmlDoc, 'report_id'),
-        dateBegin: new Date(parseInt(getXmlValue(xmlDoc, 'date_begin')) * 1000),
-        dateEnd: new Date(parseInt(getXmlValue(xmlDoc, 'date_end')) * 1000)
+        dateBegin: parseSafeDate(getXmlValue(xmlDoc, 'date_begin')),
+        dateEnd: parseSafeDate(getXmlValue(xmlDoc, 'date_end'))
     };
 
     const policy = {
@@ -624,6 +624,14 @@ function getXmlValue(xmlDoc, path) {
         if (!element) return '';
     }
     return element.textContent.trim();
+}
+
+function parseSafeDate(timestampStr) {
+    if (!timestampStr) return new Date(); // Fallback to now
+    const timestamp = parseInt(timestampStr, 10);
+    if (isNaN(timestamp)) return new Date();
+    // DMARC timestamps are usually in seconds
+    return new Date(timestamp * 1000);
 }
 
 /* ===================================
@@ -696,6 +704,7 @@ function analyzeData(data) {
    =================================== */
 
 function displayResults(data) {
+    if (!data || !data.records) return;
     const analysis = analyzeData(data);
     document.getElementById('results').classList.add('visible');
     renderStats(analysis);
@@ -815,7 +824,10 @@ function renderMetadata(data) {
    =================================== */
 
 function exportResults() {
-    if (!dmarcData) return;
+    if (!dmarcData) {
+        alert("No analysis data available to export. Please process a report first.");
+        return;
+    }
     const analysis = analyzeData(dmarcData);
     let csv = 'DMARC Report Analysis\n\nSummary Statistics\n';
     csv += `Total Messages,${analysis.totalMessages}\n`;
@@ -913,15 +925,22 @@ function setLogState(visible, collapsed) {
     if (!container) return;
 
     if (visible) container.classList.remove('hidden');
-    else container.classList.add('hidden');
 
-    if (collapsed) container.classList.add('collapsed');
-    else container.classList.remove('collapsed');
+    // For the new Card UI, we toggle 'collapsed' on the container
+    if (collapsed) {
+        container.classList.add('collapsed');
+        document.getElementById('log-toggle-icon').style.transform = 'rotate(-90deg)';
+    } else {
+        container.classList.remove('collapsed');
+        document.getElementById('log-toggle-icon').style.transform = 'rotate(0deg)';
+    }
 }
 
 function toggleLog() {
     const container = document.getElementById('progress-container');
-    container.classList.toggle('collapsed');
+    const isCollapsed = container.classList.contains('collapsed');
+    // If it was collapsed, we uncollapse it (false). If it was open, we collapse it (true).
+    setLogState(true, !isCollapsed);
 }
 
 function clearError() {

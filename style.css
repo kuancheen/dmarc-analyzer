@@ -889,86 +889,65 @@ tbody tr:last-child td {
   max-height: 250px;
   overflow-y: auto;
 
-  /* Progress Log (v1.4.0) */
-  .log-container {
-    width: 100%;
-    margin-top: 2rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
+  /* Progress Log (v1.4.6 Refined) */
+
+  /* Reuse generic card styles, but add specific logic for collapsing the body */
+  #progress-container {
     transition: all var(--transition-normal);
   }
 
-  .log-container.hidden {
-    display: none;
-  }
-
-  .log-header {
-    padding: 1rem 1.5rem;
-    background: rgba(255, 255, 255, 0.03);
-    border-bottom: 1px solid var(--border-color);
-    cursor: pointer;
+  #progress-container .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-weight: 500;
-    user-select: none;
+    background: rgba(255, 255, 255, 0.05);
+    /* Slight highlight */
   }
 
-  .log-header:hover {
-    background: rgba(255, 255, 255, 0.06);
+  #progress-container .card-header:hover {
+    background: rgba(255, 255, 255, 0.08);
   }
 
   .log-content {
-    max-height: 300px;
-    /* Limit height */
+    max-height: 400px;
     overflow-y: auto;
-    padding: 1rem;
-    background: #0f1016;
-    /* Darker background for code-like look */
-    transition: max-height 0.3s ease-in-out, padding 0.3s ease;
+    padding: var(--spacing-md);
+    background: #0d1117;
+    /* Very dark terminal-like background */
+    transition: max-height 0.3s ease-in-out, padding 0.3s ease, opacity 0.3s ease;
+    opacity: 1;
   }
 
-  .log-content.collapsed {
+  /* Collapsed State Logic */
+  #progress-container.collapsed .log-content {
     max-height: 0;
     padding-top: 0;
     padding-bottom: 0;
-    border: none;
+    opacity: 0;
+    overflow: hidden;
   }
 
-  .log-header .arrow {
+  #progress-container.collapsed {
+    /* Optional: reduce margin when collapsed if needed, but keeping card visible is fine */
+  }
+
+  .arrow {
+    font-size: 0.8rem;
+    color: var(--text-muted);
     transition: transform 0.3s ease;
   }
 
-  .log-content.collapsed+.log-header .arrow {
-    /* If we used sibling selector, but header is above content. */
-  }
-
-  /* Rotate arrow when collapsed (handled by JS toggling class on container or header) */
-  .log-container.collapsed .log-content {
-    max-height: 0;
-    padding: 0 1rem;
-    /* keep horizontal padding to prevent width jump, remove vertical */
-    border-bottom: none;
-  }
-
-  .log-container.collapsed .log-header {
-    border-bottom: none;
-  }
-
-  .log-container.collapsed .arrow {
-    transform: rotate(-90deg);
-  }
-
-
-  /* Existing log entry styles tweak */
+  /* Specific Log Typography */
   .log-entry {
-    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'Droid Sans Mono', 'Source Code Pro', monospace;
-    font-size: 0.85rem;
-    margin-bottom: 4px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.75rem;
+    /* Smaller font as requested */
+    line-height: 1.4;
+    margin-bottom: 2px;
     padding: 2px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    display: flex;
+    align-items: flex-start;
   }
 
   .log-entry:last-child {
@@ -977,33 +956,38 @@ tbody tr:last-child td {
 
   .log-timestamp {
     color: var(--text-muted);
-    margin-right: 8px;
-    font-size: 0.8em;
+    margin-right: 10px;
+    font-size: 0.75rem;
+    opacity: 0.5;
+    min-width: 70px;
+    /* Align timestamps */
   }
 
   .log-info {
-    color: var(--text-secondary);
+    color: #a5b3ce;
   }
 
   .log-success {
-    color: #43e97b;
+    color: #69f0ae;
   }
 
   .log-warning {
-    color: #feac5e;
+    color: #ffd740;
   }
 
   .log-error {
-    color: #ff6b6b;
+    color: #ff5252;
   }
 
   .log-metadata {
     display: block;
-    margin-left: 20px;
+    margin-left: 80px;
+    /* Indent to align with message text, past timestamp */
     margin-top: 2px;
-    font-size: 0.85em;
+    font-size: 0.75rem;
     color: var(--text-muted);
-    font-style: italic;
+    font-style: normal;
+    opacity: 0.7;
   }
 
 }

@@ -5,6 +5,13 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.6] - 2025-12-17
+
+### Fixed
+- **Fix**: Fixed "Invalid Date" issue by implementing safer integer parsing for XML timestamps (Unix format).
+- **Fix**: Fixed Export Results button (added null checks and better error feedback).
+- **UI**: Redesigned Progress Log to match the card aesthetic, improved typography (smaller, monospaced), and fixed the collapse/expand logic.
+
 ## [1.4.5] - 2025-12-17
 
 ### Fixed
@@ -168,6 +175,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.4.6]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.5...v1.4.6
 [1.4.5]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.4...v1.4.5
 [1.4.4]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.3...v1.4.4
 [1.4.3]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.2...v1.4.3
@@ -187,3 +195,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.1.0]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/kuancheen/dmarc-analyzer/releases/tag/v1.0.0
+é22
