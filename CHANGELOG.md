@@ -5,6 +5,11 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.5] - 2025-12-16
+
+### Fixed
+- **Critical**: Fixed cache busting mechanism. Previous versions (v1.1.2-v1.1.4) were incorrectly loading the old `v1.1.1` code due to a missing update in `index.html`. Users on Shared Drives should now actually receive the fix.
+
 ## [1.1.4] - 2025-12-16
 
 ### Fixed
@@ -93,6 +98,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.1.5]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.1.4...v1.1.5
 [1.1.4]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.1.1...v1.1.2
