@@ -70,448 +70,460 @@ function initializeEventListeners() {
 
     // Export button
     document.getElementById('export-btn').addEventListener('click', exportResults);
-}
 
-function loadGoogleScripts() {
-    // Check if scripts are loaded
-    if (typeof gapi !== 'undefined') gapiLoaded();
-    if (typeof google !== 'undefined') gisLoaded();
-}
 
-/* ===================================
-   Settings & Google API Setup
-   =================================== */
+    // IP Modal Close
+    document.getElementById('close-ip-modal').addEventListener('click', closeIpModal);
 
-function initializeSettings() {
-    const clientId = localStorage.getItem('dmarc_client_id');
-    const apiKey = localStorage.getItem('dmarc_api_key');
-
-    if (clientId) document.getElementById('client-id').value = clientId;
-    if (apiKey) document.getElementById('api-key').value = apiKey;
-
-    checkAuthStatus();
-}
-
-function openSettings() {
-    document.getElementById('settings-modal').classList.remove('hidden');
-}
-
-function closeSettings() {
-    document.getElementById('settings-modal').classList.add('hidden');
-}
-
-function saveSettings() {
-    const clientId = document.getElementById('client-id').value.trim();
-    const apiKey = document.getElementById('api-key').value.trim();
-
-    if (!clientId || !apiKey) {
-        alert('Please enter both Client ID and API Key');
-        return;
-    }
-
-    // Basic validation for API Key format (starts with AIza)
-    if (!apiKey.startsWith('AIza')) {
-        alert('Invalid API Key format. API Keys should start with "AIza". You might have pasted a Client Secret by mistake.');
-        return;
-    }
-
-    localStorage.setItem('dmarc_client_id', clientId);
-    localStorage.setItem('dmarc_api_key', apiKey);
-
-    closeSettings();
-    location.reload(); // Reload to re-initialize GAPI with new creds
-}
-
-function gapiLoaded() {
-    gapi.load('client', intializeGapiClient);
-}
-
-async function intializeGapiClient() {
-    const apiKey = localStorage.getItem('dmarc_api_key');
-    if (!apiKey) return;
-
-    try {
-        await gapi.client.init({
-            apiKey: apiKey,
-            discoveryDocs: [DISCOVERY_DOC],
-        });
-        gapiInited = true;
-        checkAuthStatus();
-    } catch (error) {
-        console.error('GAPI Init Error:', error);
-        showError('Failed to initialize Google API. Please check your API Key in Settings. It may be invalid or restricted.');
-        // Force open settings if init failed to let user fix it
-        setTimeout(() => openSettings(), 1000);
-    }
-}
-
-function gisLoaded() {
-    const clientId = localStorage.getItem('dmarc_client_id');
-    if (!clientId) return;
-
-    tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: clientId,
-        scope: SCOPES,
-        callback: (response) => {
-            if (response.error !== undefined) {
-                throw (response);
-            }
-            accessToken = response.access_token;
-            checkAuthStatus();
-        },
+    // IP Click Delegation (Table)
+    document.querySelector('#records-table tbody').addEventListener('click', (e) => {
+        const td = e.target.closest('td');
+        if (td && td.cellIndex === 0) { // First column (IP)
+            const ip = td.textContent.trim();
+            openIpModal(ip);
+        }
     });
-    gisInited = true;
-    checkAuthStatus();
-}
 
-function handleAuthClick() {
-    if (!localStorage.getItem('dmarc_client_id')) {
-        openSettings();
-        return;
+    function loadGoogleScripts() {
+        // Check if scripts are loaded
+        if (typeof gapi !== 'undefined') gapiLoaded();
+        if (typeof google !== 'undefined') gisLoaded();
     }
 
-    if (tokenClient?.requestAccessToken === undefined) {
-        // Fallback or retry logic could go here, but usually indicates script not loaded or init failed
-        if (!gisInited) {
-            // Try to load again if missed
-            loadGoogleScripts();
-            setTimeout(() => {
-                if (tokenClient?.requestAccessToken) {
-                    tokenClient.requestAccessToken({ prompt: 'consent' });
-                } else {
-                    showError('Google Services not ready. Please verify Client ID in settings and refresh.');
-                }
-            }, 1000);
+    /* ===================================
+       Settings & Google API Setup
+       =================================== */
+
+    function initializeSettings() {
+        const clientId = localStorage.getItem('dmarc_client_id');
+        const apiKey = localStorage.getItem('dmarc_api_key');
+
+        if (clientId) document.getElementById('client-id').value = clientId;
+        if (apiKey) document.getElementById('api-key').value = apiKey;
+
+        checkAuthStatus();
+    }
+
+    function openSettings() {
+        document.getElementById('settings-modal').classList.remove('hidden');
+    }
+
+    function closeSettings() {
+        document.getElementById('settings-modal').classList.add('hidden');
+    }
+
+    function saveSettings() {
+        const clientId = document.getElementById('client-id').value.trim();
+        const apiKey = document.getElementById('api-key').value.trim();
+
+        if (!clientId || !apiKey) {
+            alert('Please enter both Client ID and API Key');
             return;
         }
-        showError('Google Identity Services not initialized. Refresh page or check API settings.');
-        return;
+
+        // Basic validation for API Key format (starts with AIza)
+        if (!apiKey.startsWith('AIza')) {
+            alert('Invalid API Key format. API Keys should start with "AIza". You might have pasted a Client Secret by mistake.');
+            return;
+        }
+
+        localStorage.setItem('dmarc_client_id', clientId);
+        localStorage.setItem('dmarc_api_key', apiKey);
+
+        closeSettings();
+        location.reload(); // Reload to re-initialize GAPI with new creds
     }
 
-    tokenClient.requestAccessToken({ prompt: 'consent' });
-}
+    function gapiLoaded() {
+        gapi.load('client', intializeGapiClient);
+    }
 
-function checkAuthStatus() {
-    const authSection = document.getElementById('auth-section');
-    if (!authSection) return;
+    async function intializeGapiClient() {
+        const apiKey = localStorage.getItem('dmarc_api_key');
+        if (!apiKey) return;
 
-    if (!localStorage.getItem('dmarc_client_id')) {
-        authSection.classList.remove('hidden');
-        authSection.innerHTML = `
+        try {
+            await gapi.client.init({
+                apiKey: apiKey,
+                discoveryDocs: [DISCOVERY_DOC],
+            });
+            gapiInited = true;
+            checkAuthStatus();
+        } catch (error) {
+            console.error('GAPI Init Error:', error);
+            showError('Failed to initialize Google API. Please check your API Key in Settings. It may be invalid or restricted.');
+            // Force open settings if init failed to let user fix it
+            setTimeout(() => openSettings(), 1000);
+        }
+    }
+
+    function gisLoaded() {
+        const clientId = localStorage.getItem('dmarc_client_id');
+        if (!clientId) return;
+
+        tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: clientId,
+            scope: SCOPES,
+            callback: (response) => {
+                if (response.error !== undefined) {
+                    throw (response);
+                }
+                accessToken = response.access_token;
+                checkAuthStatus();
+            },
+        });
+        gisInited = true;
+        checkAuthStatus();
+    }
+
+    function handleAuthClick() {
+        if (!localStorage.getItem('dmarc_client_id')) {
+            openSettings();
+            return;
+        }
+
+        if (tokenClient?.requestAccessToken === undefined) {
+            // Fallback or retry logic could go here, but usually indicates script not loaded or init failed
+            if (!gisInited) {
+                // Try to load again if missed
+                loadGoogleScripts();
+                setTimeout(() => {
+                    if (tokenClient?.requestAccessToken) {
+                        tokenClient.requestAccessToken({ prompt: 'consent' });
+                    } else {
+                        showError('Google Services not ready. Please verify Client ID in settings and refresh.');
+                    }
+                }, 1000);
+                return;
+            }
+            showError('Google Identity Services not initialized. Refresh page or check API settings.');
+            return;
+        }
+
+        tokenClient.requestAccessToken({ prompt: 'consent' });
+    }
+
+    function checkAuthStatus() {
+        const authSection = document.getElementById('auth-section');
+        if (!authSection) return;
+
+        if (!localStorage.getItem('dmarc_client_id')) {
+            authSection.classList.remove('hidden');
+            authSection.innerHTML = `
             <p>Please configure your Google Cloud Credentials in Settings to use Drive features.</p>
             <button class="btn btn-secondary" style="margin-top: 10px;">⚙️ Open Settings</button>
         `;
-        // Re-attach event listener for the button we just injected
-        authSection.querySelector('button').onclick = openSettings;
-    } else if (!accessToken) {
-        authSection.classList.remove('hidden');
-        // Restore default auth button content if it was overwritten
-        if (!authSection.querySelector('#authorize-btn')) {
-            authSection.innerHTML = `
+            // Re-attach event listener for the button we just injected
+            authSection.querySelector('button').onclick = openSettings;
+        } else if (!accessToken) {
+            authSection.classList.remove('hidden');
+            // Restore default auth button content if it was overwritten
+            if (!authSection.querySelector('#authorize-btn')) {
+                authSection.innerHTML = `
                 <p>To analyze Google Drive links properly (including folders and restricted files), please sign in.</p>
                 <button class="btn btn-google" id="authorize-btn">
                     <span class="icon">🔑</span> Sign In with Google
                 </button>
              `;
-            document.getElementById('authorize-btn').addEventListener('click', handleAuthClick);
-        }
-    } else {
-        authSection.classList.add('hidden');
-    }
-}
-
-/* ===================================
-   Tab Management
-   =================================== */
-
-function switchTab(tabName) {
-    document.querySelectorAll('.tab-button').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.tab === tabName);
-    });
-
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.toggle('active', content.id === `${tabName}-tab`);
-    });
-}
-
-/* ===================================
-   Google Drive Processing
-   =================================== */
-
-async function handleDriveAnalysis() {
-    const linkInput = document.getElementById('drive-link');
-    const link = linkInput.value.trim();
-
-    if (!link) {
-        showError('Please enter a Google Drive link');
-        return;
-    }
-
-    const driveId = extractDriveId(link);
-    if (!driveId) {
-        showError('Invalid Google Drive link. Could not extract File or Folder ID.');
-        return;
-    }
-
-    if (!accessToken) {
-        showError('Please sign in with Google first to access Drive files.');
-        const authSection = document.getElementById('auth-section');
-        authSection.classList.remove('hidden');
-        authSection.scrollIntoView({ behavior: 'smooth' });
-        return;
-    }
-
-    showLoading(true);
-    clearError();
-    clearLog();
-    addLog(`Starting analysis for link: ${link}...`);
-
-    try {
-        // Try to get file metadata first to determine if it's a folder or file
-        const metadata = await gapi.client.drive.files.get({
-            fileId: driveId,
-            fields: 'id, name, mimeType',
-            supportsAllDrives: true
-        });
-
-        const mimeType = metadata.result.mimeType;
-
-        if (mimeType === 'application/vnd.google-apps.folder') {
-            await processDriveFolder(driveId);
+                document.getElementById('authorize-btn').addEventListener('click', handleAuthClick);
+            }
         } else {
-            await processDriveFile(driveId, metadata.result.name);
+            authSection.classList.add('hidden');
         }
-
-    } catch (error) {
-        console.error('Drive API Error:', error);
-        let errorMsg = error.message || (error.result && error.result.error && error.result.error.message);
-        showError(`Error accessing Google Drive: ${errorMsg || 'Unknown error'}`);
-    } finally {
-        showLoading(false);
-    }
-}
-
-function extractDriveId(url) {
-    const patterns = [
-        /\/folders\/([a-zA-Z0-9_-]+)/,      // /folders/ID
-        /\/file\/d\/([a-zA-Z0-9_-]+)/,      // /file/d/ID
-        /id=([a-zA-Z0-9_-]+)/,              // ?id=ID
-        /\/open\?id=([a-zA-Z0-9_-]+)/,      // /open?id=ID
-        /\/uc\?.*id=([a-zA-Z0-9_-]+)/       // /uc?export=download&id=ID
-    ];
-
-    for (const pattern of patterns) {
-        const match = url.match(pattern);
-        if (match) return match[1];
     }
 
-    return null;
-}
+    /* ===================================
+       Tab Management
+       =================================== */
 
-async function processDriveFolder(folderId) {
-    addLog(`Scanning folder ID: ${folderId}...`);
-    // mimeType = 'application/x-gzip' is often used for .gz files
-    const query = `'${folderId}' in parents and (mimeType = 'application/zip' or mimeType = 'application/x-gzip' or mimeType = 'application/gzip' or mimeType = 'text/xml' or name contains '.xml' or name contains '.zip' or name contains '.gz') and trashed = false`;
-
-    let files = [];
-    let pageToken = null;
-
-    do {
-        const response = await gapi.client.drive.files.list({
-            q: query,
-            fields: 'nextPageToken, files(id, name, mimeType)',
-            spaces: 'drive',
-            pageToken: pageToken,
-            supportsAllDrives: true,
-            includeItemsFromAllDrives: true
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === tabName);
         });
 
-        addLog(`Found ${response.result.files.length} potential files in this batch...`);
-        files = files.concat(response.result.files);
-        pageToken = response.result.nextPageToken;
-    } while (pageToken);
-
-    if (files.length === 0) {
-        addLog('No ZIP, GZIP, or XML files found.', 'warning');
-        throw new Error('No ZIP or XML files found in this folder.');
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.toggle('active', content.id === `${tabName}-tab`);
+        });
     }
 
-    addLog(`Total files to process: ${files.length}`);
-    let allReports = [];
+    /* ===================================
+       Google Drive Processing
+       =================================== */
 
-    for (const [index, file] of files.entries()) {
+    async function handleDriveAnalysis() {
+        const linkInput = document.getElementById('drive-link');
+        const link = linkInput.value.trim();
+
+        if (!link) {
+            showError('Please enter a Google Drive link');
+            return;
+        }
+
+        const driveId = extractDriveId(link);
+        if (!driveId) {
+            showError('Invalid Google Drive link. Could not extract File or Folder ID.');
+            return;
+        }
+
+        if (!accessToken) {
+            showError('Please sign in with Google first to access Drive files.');
+            const authSection = document.getElementById('auth-section');
+            authSection.classList.remove('hidden');
+            authSection.scrollIntoView({ behavior: 'smooth' });
+            return;
+        }
+
+        showLoading(true);
+        clearError();
+        clearLog();
+        addLog(`Starting analysis for link: ${link}...`);
+
         try {
-            addLog(`Processing file ${index + 1}/${files.length}: ${file.name} (${file.mimeType})`);
-            const fileContent = await fetchDriveFileContent(file.id);
-            const fileName = file.name.toLowerCase();
-            let type = 'xml';
-            if (fileName.endsWith('.zip') || file.mimeType.includes('zip') && !file.mimeType.includes('gzip')) {
-                type = 'zip';
-            } else if (fileName.endsWith('.gz') || file.mimeType.includes('gzip')) {
-                type = 'gzip';
+            // Try to get file metadata first to determine if it's a folder or file
+            const metadata = await gapi.client.drive.files.get({
+                fileId: driveId,
+                fields: 'id, name, mimeType',
+                supportsAllDrives: true
+            });
+
+            const mimeType = metadata.result.mimeType;
+
+            if (mimeType === 'application/vnd.google-apps.folder') {
+                await processDriveFolder(driveId);
+            } else {
+                await processDriveFile(driveId, metadata.result.name);
             }
 
-            const fileReports = await processContent(fileContent, type, file.name);
-            allReports = allReports.concat(fileReports);
-        } catch (e) {
-            console.error(`Skipping file ${file.name}:`, e);
-            addLog(`Skipped ${file.name}: ${e.message}`, 'error');
+        } catch (error) {
+            console.error('Drive API Error:', error);
+            let errorMsg = error.message || (error.result && error.result.error && error.result.error.message);
+            showError(`Error accessing Google Drive: ${errorMsg || 'Unknown error'}`);
+        } finally {
+            showLoading(false);
         }
     }
 
-    if (allReports.length === 0) {
-        throw new Error('Could not parse any valid reports from the folder.');
+    function extractDriveId(url) {
+        const patterns = [
+            /\/folders\/([a-zA-Z0-9_-]+)/,      // /folders/ID
+            /\/file\/d\/([a-zA-Z0-9_-]+)/,      // /file/d/ID
+            /id=([a-zA-Z0-9_-]+)/,              // ?id=ID
+            /\/open\?id=([a-zA-Z0-9_-]+)/,      // /open?id=ID
+            /\/uc\?.*id=([a-zA-Z0-9_-]+)/       // /uc?export=download&id=ID
+        ];
+
+        for (const pattern of patterns) {
+            const match = url.match(pattern);
+            if (match) return match[1];
+        }
+
+        return null;
     }
 
-    dmarcData = allReports.length === 1 ? allReports[0] : mergeReports(allReports);
-    displayResults(dmarcData);
-}
+    async function processDriveFolder(folderId) {
+        addLog(`Scanning folder ID: ${folderId}...`);
+        // mimeType = 'application/x-gzip' is often used for .gz files
+        const query = `'${folderId}' in parents and (mimeType = 'application/zip' or mimeType = 'application/x-gzip' or mimeType = 'application/gzip' or mimeType = 'text/xml' or name contains '.xml' or name contains '.zip' or name contains '.gz') and trashed = false`;
 
-async function processDriveFile(fileId, fileName) {
-    addLog(`Fetching single file: ${fileName}...`);
-    const content = await fetchDriveFileContent(fileId);
-    const name = fileName.toLowerCase();
+        let files = [];
+        let pageToken = null;
 
-    let type = 'xml';
-    if (name.endsWith('.zip')) {
-        type = 'zip';
-    } else if (name.endsWith('.gz')) {
-        type = 'gzip';
-    }
+        do {
+            const response = await gapi.client.drive.files.list({
+                q: query,
+                fields: 'nextPageToken, files(id, name, mimeType)',
+                spaces: 'drive',
+                pageToken: pageToken,
+                supportsAllDrives: true,
+                includeItemsFromAllDrives: true
+            });
 
-    const reports = await processContent(content, type, fileName);
+            addLog(`Found ${response.result.files.length} potential files in this batch...`);
+            files = files.concat(response.result.files);
+            pageToken = response.result.nextPageToken;
+        } while (pageToken);
 
-    if (reports.length === 0) {
-        throw new Error('No valid reports found in file.');
-    }
+        if (files.length === 0) {
+            addLog('No ZIP, GZIP, or XML files found.', 'warning');
+            throw new Error('No ZIP or XML files found in this folder.');
+        }
 
-    dmarcData = reports.length === 1 ? reports[0] : mergeReports(reports);
-    displayResults(dmarcData);
-}
+        addLog(`Total files to process: ${files.length}`);
+        let allReports = [];
 
-async function fetchDriveFileContent(fileId) {
-    return new Promise((resolve, reject) => {
-        const accessToken = gapi.auth.getToken().access_token;
-        const xhr = new XMLHttpRequest();
-        // Add supportsAllDrives=true to the URL query parameters
-        xhr.open('GET', `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&supportsAllDrives=true`);
-        xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
-        xhr.responseType = 'blob';
-        xhr.onload = () => {
-            if (xhr.status === 200) {
-                resolve(xhr.response);
-            } else {
-                reject(new Error(`Fetch failed: ${xhr.statusText}`));
+        for (const [index, file] of files.entries()) {
+            try {
+                addLog(`Processing file ${index + 1}/${files.length}: ${file.name} (${file.mimeType})`);
+                const fileContent = await fetchDriveFileContent(file.id);
+                const fileName = file.name.toLowerCase();
+                let type = 'xml';
+                if (fileName.endsWith('.zip') || file.mimeType.includes('zip') && !file.mimeType.includes('gzip')) {
+                    type = 'zip';
+                } else if (fileName.endsWith('.gz') || file.mimeType.includes('gzip')) {
+                    type = 'gzip';
+                }
+
+                const fileReports = await processContent(fileContent, type, file.name);
+                allReports = allReports.concat(fileReports);
+            } catch (e) {
+                console.error(`Skipping file ${file.name}:`, e);
+                addLog(`Skipped ${file.name}: ${e.message}`, 'error');
             }
-        };
-        xhr.onerror = () => reject(new Error('Network error'));
-        xhr.send();
-    });
-}
+        }
 
-/* ===================================
-   File Upload Handling
-   =================================== */
+        if (allReports.length === 0) {
+            throw new Error('Could not parse any valid reports from the folder.');
+        }
 
-async function handleFileUpload(file) {
-    if (!file) return;
-
-    const fileName = file.name.toLowerCase();
-    const isZip = fileName.endsWith('.zip');
-    const isGzip = fileName.endsWith('.gz') || fileName.endsWith('.gzip');
-    const isXml = fileName.endsWith('.xml');
-
-    if (!isZip && !isXml && !isGzip) {
-        showError('Please upload a ZIP, GZIP, or XML file');
-        return;
+        dmarcData = allReports.length === 1 ? allReports[0] : mergeReports(allReports);
+        displayResults(dmarcData);
     }
 
-    showLoading(true);
-    clearError();
+    async function processDriveFile(fileId, fileName) {
+        addLog(`Fetching single file: ${fileName}...`);
+        const content = await fetchDriveFileContent(fileId);
+        const name = fileName.toLowerCase();
 
-    try {
         let type = 'xml';
-        if (isZip) type = 'zip';
-        else if (isGzip) type = 'gzip';
+        if (name.endsWith('.zip')) {
+            type = 'zip';
+        } else if (name.endsWith('.gz')) {
+            type = 'gzip';
+        }
 
-        const reports = await processContent(file, type, fileName);
-        if (reports.length === 0) throw new Error('No valid reports found');
+        const reports = await processContent(content, type, fileName);
+
+        if (reports.length === 0) {
+            throw new Error('No valid reports found in file.');
+        }
 
         dmarcData = reports.length === 1 ? reports[0] : mergeReports(reports);
         displayResults(dmarcData);
-    } catch (error) {
-        showError(`Error processing file: ${error.message}`);
-    } finally {
-        showLoading(false);
     }
-}
 
-/* ===================================
-   Core Processing Logic (Shared)
-   =================================== */
+    async function fetchDriveFileContent(fileId) {
+        return new Promise((resolve, reject) => {
+            const accessToken = gapi.auth.getToken().access_token;
+            const xhr = new XMLHttpRequest();
+            // Add supportsAllDrives=true to the URL query parameters
+            xhr.open('GET', `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&supportsAllDrives=true`);
+            xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+            xhr.responseType = 'blob';
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    resolve(xhr.response);
+                } else {
+                    reject(new Error(`Fetch failed: ${xhr.statusText}`));
+                }
+            };
+            xhr.onerror = () => reject(new Error('Network error'));
+            xhr.send();
+        });
+    }
 
-async function processContent(input, type, sourceName) {
-    let xmlFiles = [];
+    /* ===================================
+       File Upload Handling
+       =================================== */
 
-    addLog(`Extracting content from ${sourceName} (${type})...`);
+    async function handleFileUpload(file) {
+        if (!file) return;
 
-    if (type === 'zip') {
-        const zip = await JSZip.loadAsync(input);
-        const xmlFileNames = Object.keys(zip.files).filter(name =>
-            name.toLowerCase().endsWith('.xml') && !name.startsWith('__MACOSX')
-        );
+        const fileName = file.name.toLowerCase();
+        const isZip = fileName.endsWith('.zip');
+        const isGzip = fileName.endsWith('.gz') || fileName.endsWith('.gzip');
+        const isXml = fileName.endsWith('.xml');
 
-        if (xmlFileNames.length === 0) {
-            console.warn(`No XML files found in ZIP: ${sourceName}`);
-            addLog(`No XML files found inside ZIP: ${sourceName}`, 'warning');
-            return [];
+        if (!isZip && !isXml && !isGzip) {
+            showError('Please upload a ZIP, GZIP, or XML file');
+            return;
         }
 
-        addLog(`Found ${xmlFileNames.length} XML file(s) in ZIP.`);
+        showLoading(true);
+        clearError();
 
-        for (const fileName of xmlFileNames) {
-            const content = await zip.files[fileName].async('text');
-            xmlFiles.push({ name: fileName, content });
-            addLog(`Extracted: ${fileName}`);
-        }
-    } else if (type === 'gzip') {
         try {
-            addLog('Decompressing GZIP...');
-            const content = await decompressGzip(input);
-            xmlFiles.push({ name: sourceName, content });
-            addLog('Decompression successful.', 'success');
-        } catch (e) {
-            console.error('GZIP Decompression failed:', e);
-            throw new Error(`Failed to decompress GZIP file: ${sourceName}`);
+            let type = 'xml';
+            if (isZip) type = 'zip';
+            else if (isGzip) type = 'gzip';
+
+            const reports = await processContent(file, type, fileName);
+            if (reports.length === 0) throw new Error('No valid reports found');
+
+            dmarcData = reports.length === 1 ? reports[0] : mergeReports(reports);
+            displayResults(dmarcData);
+        } catch (error) {
+            showError(`Error processing file: ${error.message}`);
+        } finally {
+            showLoading(false);
         }
-    } else {
-        // Direct XML file
-        let content;
-        if (input instanceof Blob) {
-            content = await input.text();
+    }
+
+    /* ===================================
+       Core Processing Logic (Shared)
+       =================================== */
+
+    async function processContent(input, type, sourceName) {
+        let xmlFiles = [];
+
+        addLog(`Extracting content from ${sourceName} (${type})...`);
+
+        if (type === 'zip') {
+            const zip = await JSZip.loadAsync(input);
+            const xmlFileNames = Object.keys(zip.files).filter(name =>
+                name.toLowerCase().endsWith('.xml') && !name.startsWith('__MACOSX')
+            );
+
+            if (xmlFileNames.length === 0) {
+                console.warn(`No XML files found in ZIP: ${sourceName}`);
+                addLog(`No XML files found inside ZIP: ${sourceName}`, 'warning');
+                return [];
+            }
+
+            addLog(`Found ${xmlFileNames.length} XML file(s) in ZIP.`);
+
+            for (const fileName of xmlFileNames) {
+                const content = await zip.files[fileName].async('text');
+                xmlFiles.push({ name: fileName, content });
+                addLog(`Extracted: ${fileName}`);
+            }
+        } else if (type === 'gzip') {
+            try {
+                addLog('Decompressing GZIP...');
+                const content = await decompressGzip(input);
+                xmlFiles.push({ name: sourceName, content });
+                addLog('Decompression successful.', 'success');
+            } catch (e) {
+                console.error('GZIP Decompression failed:', e);
+                throw new Error(`Failed to decompress GZIP file: ${sourceName}`);
+            }
         } else {
-            content = input; // Assume string
+            // Direct XML file
+            let content;
+            if (input instanceof Blob) {
+                content = await input.text();
+            } else {
+                content = input; // Assume string
+            }
+            xmlFiles.push({ name: sourceName, content });
         }
-        xmlFiles.push({ name: sourceName, content });
+
+        const reports = [];
+        for (const xmlFile of xmlFiles) {
+            const report = parseDmarcXml(xmlFile.content);
+            reports.push(report);
+
+            // LOGGING METADATA AS REQUESTED
+            const meta = report.metadata;
+            const dateRange = `${meta.dateBegin.toLocaleDateString()} - ${meta.dateEnd.toLocaleDateString()}`;
+            addLog(`Parsed: ${xmlFile.name}<br><span class="log-metadata">Org: ${meta.orgName} | ID: ${meta.reportId} | Period: ${dateRange}</span>`, 'success');
+
+        } catch (error) {
+            console.error(`Error parsing ${xmlFile.name}:`, error);
+            addLog(`Failed to parse XML ${xmlFile.name}: ${error.message}`, 'error');
+        }
     }
 
-    const reports = [];
-    for (const xmlFile of xmlFiles) {
-        const report = parseDmarcXml(xmlFile.content);
-        reports.push(report);
-
-        // LOGGING METADATA AS REQUESTED
-        const meta = report.metadata;
-        const dateRange = `${meta.dateBegin.toLocaleDateString()} - ${meta.dateEnd.toLocaleDateString()}`;
-        addLog(`Parsed: ${xmlFile.name}<br><span class="log-metadata">Org: ${meta.orgName} | ID: ${meta.reportId} | Period: ${dateRange}</span>`, 'success');
-
-    } catch (error) {
-        console.error(`Error parsing ${xmlFile.name}:`, error);
-        addLog(`Failed to parse XML ${xmlFile.name}: ${error.message}`, 'error');
-    }
-}
-
-return reports;
+    return reports;
 }
 
 async function decompressGzip(blob) {
@@ -802,6 +814,71 @@ function exportResults() {
 }
 
 /* ===================================
+   IP WHOIS / Intelligence Features
+   =================================== */
+
+function openIpModal(ip) {
+    const modal = document.getElementById('ip-modal');
+    modal.classList.remove('hidden');
+
+    // Reset State
+    document.getElementById('ip-loading').classList.remove('hidden');
+    document.getElementById('ip-details').classList.add('hidden');
+    document.getElementById('ip-error').classList.add('hidden');
+    document.getElementById('ip-abuse-warning').classList.add('hidden');
+
+    fetchIpDetails(ip);
+}
+
+function closeIpModal() {
+    document.getElementById('ip-modal').classList.add('hidden');
+}
+
+async function fetchIpDetails(ip) {
+    try {
+        const response = await fetch(`https://ipwho.is/${ip}?lang=en`);
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.message || 'Failed to fetch IP details');
+        }
+
+        renderIpDetails(data);
+    } catch (error) {
+        document.getElementById('ip-loading').classList.add('hidden');
+        const errorDiv = document.getElementById('ip-error');
+        errorDiv.textContent = `Error: ${error.message}`;
+        errorDiv.classList.remove('hidden');
+    }
+}
+
+function renderIpDetails(data) {
+    document.getElementById('ip-loading').classList.add('hidden');
+    document.getElementById('ip-details').classList.remove('hidden');
+
+    // Basic Info
+    document.getElementById('ip-address').textContent = data.ip;
+    document.getElementById('ip-org').textContent = data.connection.org || data.connection.isp || 'Unknown Organization';
+    document.getElementById('ip-flag').src = data.flag.img;
+    document.getElementById('ip-flag').alt = `${data.country} Flag`;
+
+    // Stats
+    document.getElementById('ip-location').textContent = `${data.city}, ${data.country}`;
+    document.getElementById('ip-asn').textContent = `AS${data.connection.asn}`;
+    document.getElementById('ip-isp').textContent = data.connection.isp;
+    document.getElementById('ip-type').textContent = 'Public IP'; // ipwho.is doesn't explicitly give type like "Data Center", but we can infer or leave generic
+
+    // "AI Overview" style abuse/security hints (if available or inferred)
+    // ipwho.is gives basic security info in paid tiers usually, but let's see if we can infer anything useful
+    // or just leave it clean. The user asked for "AI Overview like".
+    // We can simulate a summary sentence.
+
+    // Only show abuse warning if we had data (ipwho.is free doesn't give abuse score)
+    // So we will omit the warning for now unless we implement another API.
+}
+
+
+/* ===================================
    UI Helper Functions
    =================================== */
 
@@ -809,7 +886,14 @@ function showLoading(show) {
     document.getElementById('loading').classList.toggle('visible', show);
 }
 
-errorContainer.scrollIntoView({ behavior: 'smooth' });
+function showError(message) {
+    const errorContainer = document.getElementById('error-container');
+    if (errorContainer) {
+        errorContainer.innerHTML = `<div class="message message-error"><strong>Error:</strong> ${message}</div>`;
+        errorContainer.scrollIntoView({ behavior: 'smooth' });
+    }
+    // Ensure loading is hidden on error
+    showLoading(false);
 }
 
 function clearError() {

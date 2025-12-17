@@ -498,7 +498,19 @@ tbody tr {
 }
 
 tbody tr:hover {
-  background: var(--bg-glass);
+  background: var(--bg-glass-hover);
+}
+
+tbody tr td:first-child {
+  cursor: pointer;
+  color: #4facfe;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+}
+
+tbody tr td:first-child:hover {
+  color: #00f2fe;
+  text-decoration: underline;
 }
 
 tbody tr:last-child td {
