@@ -921,14 +921,19 @@ tbody tr:last-child td {
   /* Collapsed State Logic */
   #progress-container.collapsed .log-content {
     max-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
     opacity: 0;
     overflow: hidden;
   }
 
-  #progress-container.collapsed {
-    /* Optional: reduce margin when collapsed if needed, but keeping card visible is fine */
+  /* Zebra striping for logs */
+  .log-entry:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  .log-entry:hover {
+    background-color: rgba(255, 255, 255, 0.08);
   }
 
   .arrow {
@@ -939,9 +944,10 @@ tbody tr:last-child td {
 
   /* Specific Log Typography */
   .log-entry {
-    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-    font-size: 0.75rem;
-    /* Smaller font as requested */
+    font-family: 'Courier New', Courier, monospace;
+    /* User requested Courier New */
+    font-size: 0.7rem;
+    /* Smaller font */
     line-height: 1.4;
     margin-bottom: 2px;
     padding: 2px 0;

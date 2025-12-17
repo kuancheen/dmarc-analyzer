@@ -5,6 +5,14 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.7] - 2025-12-17
+
+### Cleanup & UI Polish
+- **UI**: Removed the redundant "Report Information" card (as requested).
+- **UI**: Updated Progress Log font to `Courier New` and added alternating background colors for better readability.
+- **Fix**: Reinforced the log collapse logic with specific padding overrides to ensure it closes completely.
+- **Fix**: Verified Export button functionality (it now actively alerts if no data is present).
+
 ## [1.4.6] - 2025-12-17
 
 ### Fixed
@@ -175,6 +183,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.4.7]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.6...v1.4.7
 [1.4.6]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.5...v1.4.6
 [1.4.5]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.4...v1.4.5
 [1.4.4]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.3...v1.4.4
