@@ -268,7 +268,8 @@ async function handleDriveAnalysis() {
         // Try to get file metadata first to determine if it's a folder or file
         const metadata = await gapi.client.drive.files.get({
             fileId: driveId,
-            fields: 'id, name, mimeType'
+            fields: 'id, name, mimeType',
+            supportsAllDrives: true
         });
 
         const mimeType = metadata.result.mimeType;
@@ -317,7 +318,9 @@ async function processDriveFolder(folderId) {
             q: query,
             fields: 'nextPageToken, files(id, name, mimeType)',
             spaces: 'drive',
-            pageToken: pageToken
+            pageToken: pageToken,
+            supportsAllDrives: true,
+            includeItemsFromAllDrives: true
         });
 
         files = files.concat(response.result.files);
@@ -381,7 +384,8 @@ async function fetchDriveFileContent(fileId) {
     return new Promise((resolve, reject) => {
         const accessToken = gapi.auth.getToken().access_token;
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
+        // Add supportsAllDrives=true to the URL query parameters
+        xhr.open('GET', `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&supportsAllDrives=true`);
         xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
         xhr.responseType = 'blob';
         xhr.onload = () => {
