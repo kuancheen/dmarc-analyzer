@@ -5,6 +5,12 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2025-12-17
+
+### Fixed
+- **Critical Fix**: Identified why the Processing Log was invisible on first run: The parent `#results` container was hidden by default!
+- **Fix**: The `resetUIForAnalysis()` function now explicitly ensures the `#results` container is made visible (`.classList.add('visible')`) *before* processing starts, allowing the child Processing Log to actually be seen.
+
 ## [1.5.9] - 2025-12-17
 
 ### Fixed
@@ -262,6 +268,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.6.0]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.9...v1.6.0
 [1.5.9]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.8...v1.5.9
 [1.5.8]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.7...v1.5.8
 [1.5.7]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.6...v1.5.7

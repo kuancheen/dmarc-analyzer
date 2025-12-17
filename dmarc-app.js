@@ -1108,6 +1108,13 @@ async function resetUIForAnalysis() {
         if (el) el.classList.add('hidden');
     });
 
+    // CRITICAL: Ensure the parent #results section is VISIBLE
+    // The log container is inside #results, so if #results is hidden/opacity:0, the log is invisible.
+    const resultsSection = document.getElementById('results');
+    if (resultsSection) {
+        resultsSection.classList.add('visible'); // Adds opacity: 1 and pointer-events: auto
+    }
+
     // Show Log Container and expand it
     const logContainer = document.getElementById('progress-container');
     if (logContainer) {
