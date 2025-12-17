@@ -693,7 +693,7 @@ function mergeReports(reports) {
    =================================== */
 
 function analyzeData(data) {
-    const totalMessages = data.records.reduce((sum, r => sum + r.count, 0);
+    const totalMessages = data.records.reduce((sum, r) => sum + r.count, 0);
 
     let dmarcPass = 0, dmarcFail = 0, spfPass = 0, dkimPass = 0;
 
