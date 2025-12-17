@@ -5,6 +5,13 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.6] - 2025-12-17
+
+### Fixed
+- **Layout**: Removed a specific extra `</div>` tag that was ejecting the Smart Summary and Log cards from the main container, fixing the width mismatch.
+- **UI**: Increased specificity of Log Zebra Striping CSS selectors to `#progress-container .log-entry` to ensure colors apply correctly.
+- **UI**: Removed conflicting `font-size` declarations in timestamp and metadata classes to enforce the global `0.7rem` Courier New style.
+
 ## [1.5.5] - 2025-12-17
 
 ### Cleanup
@@ -238,6 +245,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.5.6]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.5...v1.5.6
 [1.5.5]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.4...v1.5.5
 [1.5.4]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.3...v1.5.4
 [1.5.3]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.2...v1.5.3

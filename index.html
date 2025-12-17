@@ -21,7 +21,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="dmarc-style.css?v=1.5.5">
+    <link rel="stylesheet" href="dmarc-style.css?v=1.5.6">
 
     <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -174,161 +174,161 @@
                 </div>
             </div>
 
-    </div>
 
-    <!-- Smart Summary Card (v1.5.3 - Moved to Bottom) -->
-    <div id="summary-card" class="card mb-lg hidden">
-        <div class="card-header">
-            <h3 class="card-title">🤖 Smart Analysis & Recommendations</h3>
-        </div>
-        <div class="card-body">
-            <div class="summary-grid">
-                <div class="summary-section">
-                    <h4 class="summary-header">Key Findings</h4>
-                    <ul id="summary-findings" class="summary-list">
-                        <!-- Injected by JS -->
-                    </ul>
+
+            <!-- Smart Summary Card (v1.5.3 - Moved to Bottom) -->
+            <div id="summary-card" class="card mb-lg hidden">
+                <div class="card-header">
+                    <h3 class="card-title">🤖 Smart Analysis & Recommendations</h3>
                 </div>
-                <div class="summary-section">
-                    <h4 class="summary-header">Recommended Actions</h4>
-                    <ul id="summary-actions" class="summary-list">
-                        <!-- Injected by JS -->
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Progress Log (Collapsible at bottom) -->
-    <div id="progress-container" class="card mt-lg collapsed hidden">
-        <div class="card-header pointer" id="log-header">
-            <h3 class="card-title">
-                <span id="log-status-icon">🔄</span> Processing Log
-            </h3>
-            <span id="log-toggle-icon" class="arrow">▼</span>
-        </div>
-        <div class="card-body log-content" id="loading">
-            <!-- Log entries injected here -->
-        </div>
-    </div>
-
-    </section> <!-- End Results Section -->
-
-    </div> <!-- End Container -->
-    <!-- Footer -->
-
-    <!-- Footer -->
-    <footer class="footer">
-        <p>
-            DMARC Report Analyzer v1.5.5 |
-            <a href="https://github.com" target="_blank">GitHub</a> |
-            100% Client-Side Processing - Your data never leaves your browser
-        </p>
-        <p class="text-muted" style="margin-top: 0.5rem;">
-            &copy; 2025 DMARC Analyzer. All rights reserved.
-        </p>
-    </footer>
-
-    <!-- Application JavaScript -->
-    <script src="dmarc-app.js?v=1.5.5"></script>
-    <!-- Settings Modal -->
-    <div id="settings-modal" class="modal hidden">
-        <div class="modal-content card">
-            <div class="card-header">
-                <h3 class="card-title">⚙️ Google Drive API Settings</h3>
-                <button class="close-btn" id="close-settings">&times;</button>
-            </div>
-            <div class="card-body">
-                <p class="text-muted mb-lg">
-                    To use the Google Drive integration, you need to provide your own Google Cloud credentials.
-                    These are saved locally in your browser and are never sent to our servers.
-                </p>
-
-                <div class="form-group">
-                    <label for="client-id">OAuth Client ID</label>
-                    <input type="text" id="client-id" class="input-field"
-                        placeholder="YOUR_CLIENT_ID.apps.googleusercontent.com">
-                </div>
-
-                <div class="form-group">
-                    <label for="api-key">API Key</label>
-                    <input type="text" id="api-key" class="input-field" placeholder="AIzaSy...">
-                </div>
-
-                <div class="modal-actions">
-                    <button class="btn btn-primary" id="save-settings-btn">Save Configurations</button>
-                </div>
-
-                <div class="message message-info mt-lg">
-                    <strong>How to get credentials:</strong>
-                    <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                        <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud
-                                Console</a>
-                        </li>
-                        <li>Create a project and enable "Google Drive API"</li>
-                        <li>Create OAuth 2.0 Client ID (Web Application)</li>
-                        <li>Create API Key</li>
-                        <li>Add <code>http://localhost:8000</code> and your GitHub Pages URL to "Authorized
-                            JavaScript
-                            origins"</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- IP Details Modal -->
-    <div id="ip-modal" class="modal hidden">
-        <div class="modal-content card">
-            <div class="card-header">
-                <h3 class="card-title">IP Analysis</h3>
-                <button class="close-btn" id="close-ip-modal">&times;</button>
-            </div>
-            <div class="card-body">
-                <div id="ip-loading" class="text-center hidden">
-                    <div class="spinner" style="width: 30px; height: 30px; border-width: 3px;"></div>
-                    <p>Fetching WHOIS data...</p>
-                </div>
-                <div id="ip-details" class="hidden">
-                    <div class="ip-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-                        <img id="ip-flag" src="" alt="Flag" style="width: 32px; border-radius: 4px;">
-                        <div>
-                            <h4 id="ip-address" style="margin: 0; color: var(--text-primary);"></h4>
-                            <span id="ip-org" style="font-size: 0.9em; color: var(--text-secondary);"></span>
+                <div class="card-body">
+                    <div class="summary-grid">
+                        <div class="summary-section">
+                            <h4 class="summary-header">Key Findings</h4>
+                            <ul id="summary-findings" class="summary-list">
+                                <!-- Injected by JS -->
+                            </ul>
+                        </div>
+                        <div class="summary-section">
+                            <h4 class="summary-header">Recommended Actions</h4>
+                            <ul id="summary-actions" class="summary-list">
+                                <!-- Injected by JS -->
+                            </ul>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div class="stats-grid" style="grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 0;">
-                        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
-                            <div class="stat-label">Location</div>
-                            <div id="ip-location" style="color: white; font-weight: 500;"></div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
-                            <div class="stat-label">ASN</div>
-                            <div id="ip-asn" style="color: white; font-weight: 500;"></div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
-                            <div class="stat-label">ISP</div>
-                            <div id="ip-isp" style="color: white; font-weight: 500;"></div>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
-                            <div class="stat-label">Type</div>
-                            <div id="ip-type" style="color: white; font-weight: 500;"></div>
-                        </div>
+            <!-- Progress Log (Collapsible at bottom) -->
+            <div id="progress-container" class="card mt-lg collapsed hidden">
+                <div class="card-header pointer" id="log-header">
+                    <h3 class="card-title">
+                        <span id="log-status-icon">🔄</span> Processing Log
+                    </h3>
+                    <span id="log-toggle-icon" class="arrow">▼</span>
+                </div>
+                <div class="card-body log-content" id="loading">
+                    <!-- Log entries injected here -->
+                </div>
+            </div>
+
+        </section> <!-- End Results Section -->
+
+        <!-- Footer -->
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                DMARC Report Analyzer v1.5.6 |
+                <a href="https://github.com" target="_blank">GitHub</a> |
+                100% Client-Side Processing - Your data never leaves your browser
+            </p>
+            <p class="text-muted" style="margin-top: 0.5rem;">
+                &copy; 2025 DMARC Analyzer. All rights reserved.
+            </p>
+        </footer>
+
+        <!-- Application JavaScript -->
+        <script src="dmarc-app.js?v=1.5.6"></script>
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal hidden">
+            <div class="modal-content card">
+                <div class="card-header">
+                    <h3 class="card-title">⚙️ Google Drive API Settings</h3>
+                    <button class="close-btn" id="close-settings">&times;</button>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-lg">
+                        To use the Google Drive integration, you need to provide your own Google Cloud credentials.
+                        These are saved locally in your browser and are never sent to our servers.
+                    </p>
+
+                    <div class="form-group">
+                        <label for="client-id">OAuth Client ID</label>
+                        <input type="text" id="client-id" class="input-field"
+                            placeholder="YOUR_CLIENT_ID.apps.googleusercontent.com">
                     </div>
 
-                    <div id="ip-abuse-warning" class="message message-warning hidden" style="margin-top: 20px;">
-                        <strong>Note:</strong> <span id="ip-abuse-text"></span>
+                    <div class="form-group">
+                        <label for="api-key">API Key</label>
+                        <input type="text" id="api-key" class="input-field" placeholder="AIzaSy...">
                     </div>
 
-                    <div style="margin-top: 15px; font-size: 0.8em; color: var(--text-muted); text-align: right;">
-                        Data provided by ipwho.is
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" id="save-settings-btn">Save Configurations</button>
+                    </div>
+
+                    <div class="message message-info mt-lg">
+                        <strong>How to get credentials:</strong>
+                        <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                            <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud
+                                    Console</a>
+                            </li>
+                            <li>Create a project and enable "Google Drive API"</li>
+                            <li>Create OAuth 2.0 Client ID (Web Application)</li>
+                            <li>Create API Key</li>
+                            <li>Add <code>http://localhost:8000</code> and your GitHub Pages URL to "Authorized
+                                JavaScript
+                                origins"</li>
+                        </ol>
                     </div>
                 </div>
-                <div id="ip-error" class="message message-error hidden"></div>
             </div>
         </div>
-    </div>
+
+        <!-- IP Details Modal -->
+        <div id="ip-modal" class="modal hidden">
+            <div class="modal-content card">
+                <div class="card-header">
+                    <h3 class="card-title">IP Analysis</h3>
+                    <button class="close-btn" id="close-ip-modal">&times;</button>
+                </div>
+                <div class="card-body">
+                    <div id="ip-loading" class="text-center hidden">
+                        <div class="spinner" style="width: 30px; height: 30px; border-width: 3px;"></div>
+                        <p>Fetching WHOIS data...</p>
+                    </div>
+                    <div id="ip-details" class="hidden">
+                        <div class="ip-header"
+                            style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                            <img id="ip-flag" src="" alt="Flag" style="width: 32px; border-radius: 4px;">
+                            <div>
+                                <h4 id="ip-address" style="margin: 0; color: var(--text-primary);"></h4>
+                                <span id="ip-org" style="font-size: 0.9em; color: var(--text-secondary);"></span>
+                            </div>
+                        </div>
+
+                        <div class="stats-grid" style="grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 0;">
+                            <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                                <div class="stat-label">Location</div>
+                                <div id="ip-location" style="color: white; font-weight: 500;"></div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                                <div class="stat-label">ASN</div>
+                                <div id="ip-asn" style="color: white; font-weight: 500;"></div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                                <div class="stat-label">ISP</div>
+                                <div id="ip-isp" style="color: white; font-weight: 500;"></div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                                <div class="stat-label">Type</div>
+                                <div id="ip-type" style="color: white; font-weight: 500;"></div>
+                            </div>
+                        </div>
+
+                        <div id="ip-abuse-warning" class="message message-warning hidden" style="margin-top: 20px;">
+                            <strong>Note:</strong> <span id="ip-abuse-text"></span>
+                        </div>
+
+                        <div style="margin-top: 15px; font-size: 0.8em; color: var(--text-muted); text-align: right;">
+                            Data provided by ipwho.is
+                        </div>
+                    </div>
+                    <div id="ip-error" class="message message-error hidden"></div>
+                </div>
+            </div>
+        </div>
 </body>
 
 </html>
