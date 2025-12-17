@@ -523,243 +523,243 @@ function initializeEventListeners() {
                 addLog(`Failed to parse XML ${xmlFile.name}: ${error.message}`, 'error');
             }
         }
+
+
+        return reports;
     }
 
-    return reports;
-}
-
-async function decompressGzip(blob) {
-    // Check for DecompressionStream support
-    if ('DecompressionStream' in window) {
-        const ds = new DecompressionStream('gzip');
-        const stream = blob.stream().pipeThrough(ds);
-        return new Response(stream).text();
-    } else {
-        throw new Error('GZIP decompression is not supported in this browser. Please use a modern browser (Chrome, Edge, Safari, Firefox).');
-    }
-}
-
-/* ===================================
-   DMARC XML Parsing
-   =================================== */
-
-function parseDmarcXml(xmlString) {
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
-
-    if (xmlDoc.querySelector('parsererror')) {
-        throw new Error('Invalid XML format');
+    async function decompressGzip(blob) {
+        // Check for DecompressionStream support
+        if ('DecompressionStream' in window) {
+            const ds = new DecompressionStream('gzip');
+            const stream = blob.stream().pipeThrough(ds);
+            return new Response(stream).text();
+        } else {
+            throw new Error('GZIP decompression is not supported in this browser. Please use a modern browser (Chrome, Edge, Safari, Firefox).');
+        }
     }
 
-    const metadata = {
-        orgName: getXmlValue(xmlDoc, 'org_name'),
-        email: getXmlValue(xmlDoc, 'email'),
-        reportId: getXmlValue(xmlDoc, 'report_id'),
-        dateBegin: new Date(parseInt(getXmlValue(xmlDoc, 'date_begin')) * 1000),
-        dateEnd: new Date(parseInt(getXmlValue(xmlDoc, 'date_end')) * 1000)
-    };
+    /* ===================================
+       DMARC XML Parsing
+       =================================== */
 
-    const policy = {
-        domain: getXmlValue(xmlDoc, 'policy_published domain'),
-        adkim: getXmlValue(xmlDoc, 'policy_published adkim') || 'r',
-        aspf: getXmlValue(xmlDoc, 'policy_published aspf') || 'r',
-        p: getXmlValue(xmlDoc, 'policy_published p'),
-        sp: getXmlValue(xmlDoc, 'policy_published sp') || 'none',
-        pct: getXmlValue(xmlDoc, 'policy_published pct') || '100'
-    };
+    function parseDmarcXml(xmlString) {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
 
-    const records = [];
-    xmlDoc.querySelectorAll('record').forEach(record => {
-        records.push({
-            sourceIp: getXmlValue(record, 'source_ip'),
-            count: parseInt(getXmlValue(record, 'count')) || 0,
-            policyEvaluated: {
-                disposition: getXmlValue(record, 'policy_evaluated disposition'),
-                dkim: getXmlValue(record, 'policy_evaluated dkim'),
-                spf: getXmlValue(record, 'policy_evaluated spf')
-            },
-            authResults: {
-                spfDomain: getXmlValue(record, 'auth_results spf domain'),
-                spfResult: getXmlValue(record, 'auth_results spf result'),
-                dkimDomain: getXmlValue(record, 'auth_results dkim domain'),
-                dkimResult: getXmlValue(record, 'auth_results dkim result'),
-                dkimSelector: getXmlValue(record, 'auth_results dkim selector')
-            }
+        if (xmlDoc.querySelector('parsererror')) {
+            throw new Error('Invalid XML format');
+        }
+
+        const metadata = {
+            orgName: getXmlValue(xmlDoc, 'org_name'),
+            email: getXmlValue(xmlDoc, 'email'),
+            reportId: getXmlValue(xmlDoc, 'report_id'),
+            dateBegin: new Date(parseInt(getXmlValue(xmlDoc, 'date_begin')) * 1000),
+            dateEnd: new Date(parseInt(getXmlValue(xmlDoc, 'date_end')) * 1000)
+        };
+
+        const policy = {
+            domain: getXmlValue(xmlDoc, 'policy_published domain'),
+            adkim: getXmlValue(xmlDoc, 'policy_published adkim') || 'r',
+            aspf: getXmlValue(xmlDoc, 'policy_published aspf') || 'r',
+            p: getXmlValue(xmlDoc, 'policy_published p'),
+            sp: getXmlValue(xmlDoc, 'policy_published sp') || 'none',
+            pct: getXmlValue(xmlDoc, 'policy_published pct') || '100'
+        };
+
+        const records = [];
+        xmlDoc.querySelectorAll('record').forEach(record => {
+            records.push({
+                sourceIp: getXmlValue(record, 'source_ip'),
+                count: parseInt(getXmlValue(record, 'count')) || 0,
+                policyEvaluated: {
+                    disposition: getXmlValue(record, 'policy_evaluated disposition'),
+                    dkim: getXmlValue(record, 'policy_evaluated dkim'),
+                    spf: getXmlValue(record, 'policy_evaluated spf')
+                },
+                authResults: {
+                    spfDomain: getXmlValue(record, 'auth_results spf domain'),
+                    spfResult: getXmlValue(record, 'auth_results spf result'),
+                    dkimDomain: getXmlValue(record, 'auth_results dkim domain'),
+                    dkimResult: getXmlValue(record, 'auth_results dkim result'),
+                    dkimSelector: getXmlValue(record, 'auth_results dkim selector')
+                }
+            });
         });
-    });
 
-    return { metadata, policy, records };
-}
-
-function getXmlValue(xmlDoc, path) {
-    const tags = path.split(' ');
-    let element = xmlDoc;
-    for (const tag of tags) {
-        element = element.querySelector(tag);
-        if (!element) return '';
+        return { metadata, policy, records };
     }
-    return element.textContent.trim();
-}
 
-/* ===================================
-   Report Merging
-   =================================== */
+    function getXmlValue(xmlDoc, path) {
+        const tags = path.split(' ');
+        let element = xmlDoc;
+        for (const tag of tags) {
+            element = element.querySelector(tag);
+            if (!element) return '';
+        }
+        return element.textContent.trim();
+    }
 
-function mergeReports(reports) {
-    if (reports.length === 0) return null;
+    /* ===================================
+       Report Merging
+       =================================== */
 
-    const merged = {
-        metadata: reports[0].metadata,
-        policy: reports[0].policy,
-        records: []
-    };
+    function mergeReports(reports) {
+        if (reports.length === 0) return null;
 
-    merged.metadata.dateBegin = new Date(Math.min(...reports.map(r => r.metadata.dateBegin)));
-    merged.metadata.dateEnd = new Date(Math.max(...reports.map(r => r.metadata.dateEnd)));
+        const merged = {
+            metadata: reports[0].metadata,
+            policy: reports[0].policy,
+            records: []
+        };
 
-    const recordMap = new Map();
-    reports.forEach(report => {
-        report.records.forEach(record => {
-            const key = record.sourceIp;
-            if (recordMap.has(key)) {
-                recordMap.get(key).count += record.count;
-            } else {
-                recordMap.set(key, { ...record });
-            }
+        merged.metadata.dateBegin = new Date(Math.min(...reports.map(r => r.metadata.dateBegin)));
+        merged.metadata.dateEnd = new Date(Math.max(...reports.map(r => r.metadata.dateEnd)));
+
+        const recordMap = new Map();
+        reports.forEach(report => {
+            report.records.forEach(record => {
+                const key = record.sourceIp;
+                if (recordMap.has(key)) {
+                    recordMap.get(key).count += record.count;
+                } else {
+                    recordMap.set(key, { ...record });
+                }
+            });
         });
-    });
 
-    merged.records = Array.from(recordMap.values());
-    return merged;
-}
+        merged.records = Array.from(recordMap.values());
+        return merged;
+    }
 
-/* ===================================
-   Data Analysis
-   =================================== */
+    /* ===================================
+       Data Analysis
+       =================================== */
 
-function analyzeData(data) {
-    const totalMessages = data.records.reduce((sum, r) => sum + r.count, 0);
+    function analyzeData(data) {
+        const totalMessages = data.records.reduce((sum, r) => sum + r.count, 0);
 
-    let dmarcPass = 0, dmarcFail = 0, spfPass = 0, dkimPass = 0;
+        let dmarcPass = 0, dmarcFail = 0, spfPass = 0, dkimPass = 0;
 
-    data.records.forEach(record => {
-        const isDmarcPass = record.policyEvaluated.dkim === 'pass' ||
-            record.policyEvaluated.spf === 'pass';
+        data.records.forEach(record => {
+            const isDmarcPass = record.policyEvaluated.dkim === 'pass' ||
+                record.policyEvaluated.spf === 'pass';
 
-        if (isDmarcPass) dmarcPass += record.count;
-        else dmarcFail += record.count;
+            if (isDmarcPass) dmarcPass += record.count;
+            else dmarcFail += record.count;
 
-        if (record.policyEvaluated.spf === 'pass') spfPass += record.count;
-        if (record.policyEvaluated.dkim === 'pass') dkimPass += record.count;
-    });
+            if (record.policyEvaluated.spf === 'pass') spfPass += record.count;
+            if (record.policyEvaluated.dkim === 'pass') dkimPass += record.count;
+        });
 
-    return {
-        totalMessages,
-        dmarcPass,
-        dmarcFail,
-        spfPass,
-        dkimPass,
-        dmarcPassRate: totalMessages > 0 ? ((dmarcPass / totalMessages) * 100).toFixed(1) : 0,
-        spfPassRate: totalMessages > 0 ? ((spfPass / totalMessages) * 100).toFixed(1) : 0,
-        dkimPassRate: totalMessages > 0 ? ((dkimPass / totalMessages) * 100).toFixed(1) : 0,
-        uniqueSources: data.records.length
-    };
-}
+        return {
+            totalMessages,
+            dmarcPass,
+            dmarcFail,
+            spfPass,
+            dkimPass,
+            dmarcPassRate: totalMessages > 0 ? ((dmarcPass / totalMessages) * 100).toFixed(1) : 0,
+            spfPassRate: totalMessages > 0 ? ((spfPass / totalMessages) * 100).toFixed(1) : 0,
+            dkimPassRate: totalMessages > 0 ? ((dkimPass / totalMessages) * 100).toFixed(1) : 0,
+            uniqueSources: data.records.length
+        };
+    }
 
-/* ===================================
-   Results Display
-   =================================== */
+    /* ===================================
+       Results Display
+       =================================== */
 
-function displayResults(data) {
-    const analysis = analyzeData(data);
-    document.getElementById('results').classList.add('visible');
-    renderStats(analysis);
-    renderCharts(data, analysis);
-    renderTable(data);
-    renderMetadata(data);
-    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
-}
+    function displayResults(data) {
+        const analysis = analyzeData(data);
+        document.getElementById('results').classList.add('visible');
+        renderStats(analysis);
+        renderCharts(data, analysis);
+        renderTable(data);
+        renderMetadata(data);
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+    }
 
-function renderStats(analysis) {
-    const statsGrid = document.getElementById('stats-grid');
-    const stats = [
-        { label: 'Total Messages', value: analysis.totalMessages.toLocaleString(), class: '' },
-        { label: 'DMARC Pass Rate', value: `${analysis.dmarcPassRate}%`, class: analysis.dmarcPassRate >= 95 ? 'success' : analysis.dmarcPassRate >= 80 ? 'warning' : 'danger' },
-        { label: 'SPF Pass Rate', value: `${analysis.spfPassRate}%`, class: analysis.spfPassRate >= 95 ? 'success' : analysis.spfPassRate >= 80 ? 'warning' : 'danger' },
-        { label: 'DKIM Pass Rate', value: `${analysis.dkimPassRate}%`, class: analysis.dkimPassRate >= 95 ? 'success' : analysis.dkimPassRate >= 80 ? 'warning' : 'danger' },
-        { label: 'Unique Sources', value: analysis.uniqueSources.toLocaleString(), class: '' },
-        { label: 'Failed Messages', value: analysis.dmarcFail.toLocaleString(), class: analysis.dmarcFail > 0 ? 'danger' : 'success' }
-    ];
+    function renderStats(analysis) {
+        const statsGrid = document.getElementById('stats-grid');
+        const stats = [
+            { label: 'Total Messages', value: analysis.totalMessages.toLocaleString(), class: '' },
+            { label: 'DMARC Pass Rate', value: `${analysis.dmarcPassRate}%`, class: analysis.dmarcPassRate >= 95 ? 'success' : analysis.dmarcPassRate >= 80 ? 'warning' : 'danger' },
+            { label: 'SPF Pass Rate', value: `${analysis.spfPassRate}%`, class: analysis.spfPassRate >= 95 ? 'success' : analysis.spfPassRate >= 80 ? 'warning' : 'danger' },
+            { label: 'DKIM Pass Rate', value: `${analysis.dkimPassRate}%`, class: analysis.dkimPassRate >= 95 ? 'success' : analysis.dkimPassRate >= 80 ? 'warning' : 'danger' },
+            { label: 'Unique Sources', value: analysis.uniqueSources.toLocaleString(), class: '' },
+            { label: 'Failed Messages', value: analysis.dmarcFail.toLocaleString(), class: analysis.dmarcFail > 0 ? 'danger' : 'success' }
+        ];
 
-    statsGrid.innerHTML = stats.map(stat => `
+        statsGrid.innerHTML = stats.map(stat => `
         <div class="stat-card">
             <div class="stat-label">${stat.label}</div>
             <div class="stat-value ${stat.class}">${stat.value}</div>
         </div>
     `).join('');
-}
+    }
 
-function renderCharts(data, analysis) {
-    Object.values(charts).forEach(chart => chart.destroy());
-    charts = {};
+    function renderCharts(data, analysis) {
+        Object.values(charts).forEach(chart => chart.destroy());
+        charts = {};
 
-    const authCtx = document.getElementById('auth-chart').getContext('2d');
-    charts.auth = new Chart(authCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['DMARC Pass', 'DMARC Fail'],
-            datasets: [{
-                data: [analysis.dmarcPass, analysis.dmarcFail],
-                backgroundColor: ['rgba(67, 233, 123, 0.8)', 'rgba(255, 107, 107, 0.8)'],
-                borderColor: ['rgba(67, 233, 123, 1)', 'rgba(255, 107, 107, 1)'],
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { color: '#b8b8d1', font: { size: 12 } }
+        const authCtx = document.getElementById('auth-chart').getContext('2d');
+        charts.auth = new Chart(authCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['DMARC Pass', 'DMARC Fail'],
+                datasets: [{
+                    data: [analysis.dmarcPass, analysis.dmarcFail],
+                    backgroundColor: ['rgba(67, 233, 123, 0.8)', 'rgba(255, 107, 107, 0.8)'],
+                    borderColor: ['rgba(67, 233, 123, 1)', 'rgba(255, 107, 107, 1)'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#b8b8d1', font: { size: 12 } }
+                    }
                 }
             }
-        }
-    });
+        });
 
-    const sortedRecords = [...data.records].sort((a, b) => b.count - a.count).slice(0, 10);
-    const volumeCtx = document.getElementById('volume-chart').getContext('2d');
-    charts.volume = new Chart(volumeCtx, {
-        type: 'bar',
-        data: {
-            labels: sortedRecords.map(r => r.sourceIp),
-            datasets: [{
-                label: 'Messages',
-                data: sortedRecords.map(r => r.count),
-                backgroundColor: 'rgba(102, 126, 234, 0.8)',
-                borderColor: 'rgba(102, 126, 234, 1)',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { beginAtZero: true, ticks: { color: '#b8b8d1' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
-                x: { ticks: { color: '#b8b8d1', maxRotation: 45, minRotation: 45 }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
+        const sortedRecords = [...data.records].sort((a, b) => b.count - a.count).slice(0, 10);
+        const volumeCtx = document.getElementById('volume-chart').getContext('2d');
+        charts.volume = new Chart(volumeCtx, {
+            type: 'bar',
+            data: {
+                labels: sortedRecords.map(r => r.sourceIp),
+                datasets: [{
+                    label: 'Messages',
+                    data: sortedRecords.map(r => r.count),
+                    backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { color: '#b8b8d1' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                    x: { ticks: { color: '#b8b8d1', maxRotation: 45, minRotation: 45 }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
+                }
             }
-        }
-    });
-}
+        });
+    }
 
-function renderTable(data) {
-    const tbody = document.getElementById('records-table').querySelector('tbody');
-    if (!tbody) return;
-    const sortedRecords = [...data.records].sort((a, b) => b.count - a.count);
-    tbody.innerHTML = sortedRecords.map(record => {
-        const dmarcPass = record.policyEvaluated.dkim === 'pass' || record.policyEvaluated.spf === 'pass';
-        return `
+    function renderTable(data) {
+        const tbody = document.getElementById('records-table').querySelector('tbody');
+        if (!tbody) return;
+        const sortedRecords = [...data.records].sort((a, b) => b.count - a.count);
+        tbody.innerHTML = sortedRecords.map(record => {
+            const dmarcPass = record.policyEvaluated.dkim === 'pass' || record.policyEvaluated.spf === 'pass';
+            return `
             <tr>
                 <td><code>${record.sourceIp}</code></td>
                 <td>${record.count.toLocaleString()}</td>
@@ -769,13 +769,13 @@ function renderTable(data) {
                 <td><span class="badge badge-info">${record.policyEvaluated.disposition}</span></td>
             </tr>
         `;
-    }).join('');
-}
+        }).join('');
+    }
 
-function renderMetadata(data) {
-    const metadata = document.getElementById('metadata');
-    const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-    metadata.innerHTML = `
+    function renderMetadata(data) {
+        const metadata = document.getElementById('metadata');
+        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        metadata.innerHTML = `
         <p><strong>Organization:</strong> ${data.metadata.orgName}</p>
         <p><strong>Report ID:</strong> ${data.metadata.reportId}</p>
         <p><strong>Report Period:</strong> ${data.metadata.dateBegin.toLocaleDateString('en-US', dateOptions)} - ${data.metadata.dateEnd.toLocaleDateString('en-US', dateOptions)}</p>
@@ -784,136 +784,136 @@ function renderMetadata(data) {
         <p><strong>DKIM Alignment:</strong> ${data.policy.adkim === 'r' ? 'Relaxed' : 'Strict'}</p>
         <p><strong>SPF Alignment:</strong> ${data.policy.aspf === 'r' ? 'Relaxed' : 'Strict'}</p>
     `;
-}
+    }
 
-/* ===================================
-   Export Functionality
-   =================================== */
+    /* ===================================
+       Export Functionality
+       =================================== */
 
-function exportResults() {
-    if (!dmarcData) return;
-    const analysis = analyzeData(dmarcData);
-    let csv = 'DMARC Report Analysis\n\nSummary Statistics\n';
-    csv += `Total Messages,${analysis.totalMessages}\n`;
-    csv += `DMARC Pass Rate,${analysis.dmarcPassRate}%\n`;
-    csv += `SPF Pass Rate,${analysis.spfPassRate}%\n`;
-    csv += `DKIM Pass Rate,${analysis.dkimPassRate}%\n`;
-    csv += `Unique Sources,${analysis.uniqueSources}\n\n`;
-    csv += 'Detailed Records\nSource IP,Count,SPF,DKIM,DMARC,Disposition\n';
-    dmarcData.records.forEach(record => {
-        const dmarcPass = record.policyEvaluated.dkim === 'pass' || record.policyEvaluated.spf === 'pass';
-        csv += `${record.sourceIp},${record.count},${record.policyEvaluated.spf},${record.policyEvaluated.dkim},${dmarcPass ? 'pass' : 'fail'},${record.policyEvaluated.disposition}\n`;
-    });
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `dmarc-analysis-${Date.now()}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-}
+    function exportResults() {
+        if (!dmarcData) return;
+        const analysis = analyzeData(dmarcData);
+        let csv = 'DMARC Report Analysis\n\nSummary Statistics\n';
+        csv += `Total Messages,${analysis.totalMessages}\n`;
+        csv += `DMARC Pass Rate,${analysis.dmarcPassRate}%\n`;
+        csv += `SPF Pass Rate,${analysis.spfPassRate}%\n`;
+        csv += `DKIM Pass Rate,${analysis.dkimPassRate}%\n`;
+        csv += `Unique Sources,${analysis.uniqueSources}\n\n`;
+        csv += 'Detailed Records\nSource IP,Count,SPF,DKIM,DMARC,Disposition\n';
+        dmarcData.records.forEach(record => {
+            const dmarcPass = record.policyEvaluated.dkim === 'pass' || record.policyEvaluated.spf === 'pass';
+            csv += `${record.sourceIp},${record.count},${record.policyEvaluated.spf},${record.policyEvaluated.dkim},${dmarcPass ? 'pass' : 'fail'},${record.policyEvaluated.disposition}\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `dmarc-analysis-${Date.now()}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }
 
-/* ===================================
-   IP WHOIS / Intelligence Features
-   =================================== */
+    /* ===================================
+       IP WHOIS / Intelligence Features
+       =================================== */
 
-function openIpModal(ip) {
-    const modal = document.getElementById('ip-modal');
-    modal.classList.remove('hidden');
+    function openIpModal(ip) {
+        const modal = document.getElementById('ip-modal');
+        modal.classList.remove('hidden');
 
-    // Reset State
-    document.getElementById('ip-loading').classList.remove('hidden');
-    document.getElementById('ip-details').classList.add('hidden');
-    document.getElementById('ip-error').classList.add('hidden');
-    document.getElementById('ip-abuse-warning').classList.add('hidden');
+        // Reset State
+        document.getElementById('ip-loading').classList.remove('hidden');
+        document.getElementById('ip-details').classList.add('hidden');
+        document.getElementById('ip-error').classList.add('hidden');
+        document.getElementById('ip-abuse-warning').classList.add('hidden');
 
-    fetchIpDetails(ip);
-}
+        fetchIpDetails(ip);
+    }
 
-function closeIpModal() {
-    document.getElementById('ip-modal').classList.add('hidden');
-}
+    function closeIpModal() {
+        document.getElementById('ip-modal').classList.add('hidden');
+    }
 
-async function fetchIpDetails(ip) {
-    try {
-        const response = await fetch(`https://ipwho.is/${ip}?lang=en`);
-        const data = await response.json();
+    async function fetchIpDetails(ip) {
+        try {
+            const response = await fetch(`https://ipwho.is/${ip}?lang=en`);
+            const data = await response.json();
 
-        if (!data.success) {
-            throw new Error(data.message || 'Failed to fetch IP details');
+            if (!data.success) {
+                throw new Error(data.message || 'Failed to fetch IP details');
+            }
+
+            renderIpDetails(data);
+        } catch (error) {
+            document.getElementById('ip-loading').classList.add('hidden');
+            const errorDiv = document.getElementById('ip-error');
+            errorDiv.textContent = `Error: ${error.message}`;
+            errorDiv.classList.remove('hidden');
         }
+    }
 
-        renderIpDetails(data);
-    } catch (error) {
+    function renderIpDetails(data) {
         document.getElementById('ip-loading').classList.add('hidden');
-        const errorDiv = document.getElementById('ip-error');
-        errorDiv.textContent = `Error: ${error.message}`;
-        errorDiv.classList.remove('hidden');
+        document.getElementById('ip-details').classList.remove('hidden');
+
+        // Basic Info
+        document.getElementById('ip-address').textContent = data.ip;
+        document.getElementById('ip-org').textContent = data.connection.org || data.connection.isp || 'Unknown Organization';
+        document.getElementById('ip-flag').src = data.flag.img;
+        document.getElementById('ip-flag').alt = `${data.country} Flag`;
+
+        // Stats
+        document.getElementById('ip-location').textContent = `${data.city}, ${data.country}`;
+        document.getElementById('ip-asn').textContent = `AS${data.connection.asn}`;
+        document.getElementById('ip-isp').textContent = data.connection.isp;
+        document.getElementById('ip-type').textContent = 'Public IP'; // ipwho.is doesn't explicitly give type like "Data Center", but we can infer or leave generic
+
+        // "AI Overview" style abuse/security hints (if available or inferred)
+        // ipwho.is gives basic security info in paid tiers usually, but let's see if we can infer anything useful
+        // or just leave it clean. The user asked for "AI Overview like".
+        // We can simulate a summary sentence.
+
+        // Only show abuse warning if we had data (ipwho.is free doesn't give abuse score)
+        // So we will omit the warning for now unless we implement another API.
     }
-}
-
-function renderIpDetails(data) {
-    document.getElementById('ip-loading').classList.add('hidden');
-    document.getElementById('ip-details').classList.remove('hidden');
-
-    // Basic Info
-    document.getElementById('ip-address').textContent = data.ip;
-    document.getElementById('ip-org').textContent = data.connection.org || data.connection.isp || 'Unknown Organization';
-    document.getElementById('ip-flag').src = data.flag.img;
-    document.getElementById('ip-flag').alt = `${data.country} Flag`;
-
-    // Stats
-    document.getElementById('ip-location').textContent = `${data.city}, ${data.country}`;
-    document.getElementById('ip-asn').textContent = `AS${data.connection.asn}`;
-    document.getElementById('ip-isp').textContent = data.connection.isp;
-    document.getElementById('ip-type').textContent = 'Public IP'; // ipwho.is doesn't explicitly give type like "Data Center", but we can infer or leave generic
-
-    // "AI Overview" style abuse/security hints (if available or inferred)
-    // ipwho.is gives basic security info in paid tiers usually, but let's see if we can infer anything useful
-    // or just leave it clean. The user asked for "AI Overview like".
-    // We can simulate a summary sentence.
-
-    // Only show abuse warning if we had data (ipwho.is free doesn't give abuse score)
-    // So we will omit the warning for now unless we implement another API.
-}
 
 
-/* ===================================
-   UI Helper Functions
-   =================================== */
+    /* ===================================
+       UI Helper Functions
+       =================================== */
 
-function showLoading(show) {
-    document.getElementById('loading').classList.toggle('visible', show);
-}
-
-function showError(message) {
-    const errorContainer = document.getElementById('error-container');
-    if (errorContainer) {
-        errorContainer.innerHTML = `<div class="message message-error"><strong>Error:</strong> ${message}</div>`;
-        errorContainer.scrollIntoView({ behavior: 'smooth' });
+    function showLoading(show) {
+        document.getElementById('loading').classList.toggle('visible', show);
     }
-    // Ensure loading is hidden on error
-    showLoading(false);
-}
 
-function clearError() {
-    document.getElementById('error-container').innerHTML = '';
-}
+    function showError(message) {
+        const errorContainer = document.getElementById('error-container');
+        if (errorContainer) {
+            errorContainer.innerHTML = `<div class="message message-error"><strong>Error:</strong> ${message}</div>`;
+            errorContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        // Ensure loading is hidden on error
+        showLoading(false);
+    }
 
-function clearLog() {
-    const log = document.getElementById('progress-log');
-    if (log) log.innerHTML = '';
-}
+    function clearError() {
+        document.getElementById('error-container').innerHTML = '';
+    }
 
-function addLog(message, type = 'info') {
-    const logContainer = document.getElementById('progress-log');
-    if (!logContainer) return;
-    const entry = document.createElement('div');
-    entry.className = `log-entry log-${type}`;
-    const timestamp = new Date().toLocaleTimeString([], { hour12: false });
-    entry.innerHTML = `<span class="log-timestamp">[${timestamp}]</span> ${message}`;
-    logContainer.appendChild(entry);
-    logContainer.scrollTop = logContainer.scrollHeight;
-}
+    function clearLog() {
+        const log = document.getElementById('progress-log');
+        if (log) log.innerHTML = '';
+    }
+
+    function addLog(message, type = 'info') {
+        const logContainer = document.getElementById('progress-log');
+        if (!logContainer) return;
+        const entry = document.createElement('div');
+        entry.className = `log-entry log-${type}`;
+        const timestamp = new Date().toLocaleTimeString([], { hour12: false });
+        entry.innerHTML = `<span class="log-timestamp">[${timestamp}]</span> ${message}`;
+        logContainer.appendChild(entry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
