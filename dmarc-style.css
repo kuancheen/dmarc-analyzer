@@ -952,130 +952,128 @@ tbody tr:last-child td {
    Progress Log
    =================================== */
 
-.progress-log {
+/* ===================================
+   Progress Log
+   =================================== */
+
+/* Use ID directly as it's the main container */
+#progress-container {
   margin-top: var(--spacing-md);
-  max-height: 250px;
+  transition: all var(--transition-normal);
+}
+
+#progress-container .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  /* Slight highlight */
+}
+
+#progress-container .card-header:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.log-content {
+  max-height: 400px;
   overflow-y: auto;
+  padding: var(--spacing-md);
+  background: #0d1117;
+  /* Very dark terminal-like background */
+  transition: max-height 0.3s ease-in-out, padding 0.3s ease, opacity 0.3s ease;
+  opacity: 1;
+}
 
-  /* Progress Log (v1.4.6 Refined) */
+/* Collapsed State Logic */
+#progress-container.collapsed .log-content {
+  max-height: 0;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  opacity: 0;
+  overflow: hidden;
+}
 
-  /* Reuse generic card styles, but add specific logic for collapsing the body */
-  #progress-container {
-    transition: all var(--transition-normal);
-  }
+/* Zebra striping for logs (High Contrast) */
+.log-entry:nth-child(even) {
 
-  #progress-container .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.05);
-    /* Slight highlight */
-  }
-
-  #progress-container .card-header:hover {
-    background: rgba(255, 255, 255, 0.08);
-  }
-
-  .log-content {
-    max-height: 400px;
-    overflow-y: auto;
-    padding: var(--spacing-md);
-    background: #0d1117;
-    /* Very dark terminal-like background */
-    transition: max-height 0.3s ease-in-out, padding 0.3s ease, opacity 0.3s ease;
-    opacity: 1;
-  }
-
-  /* Collapsed State Logic */
-  #progress-container.collapsed .log-content {
-    max-height: 0;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    opacity: 0;
-    overflow: hidden;
-  }
-
-  /* Zebra striping for logs (High Contrast) */
+  /* Zebra striping for logs (High Contrast - v1.5.3) */
   .log-entry:nth-child(even) {
-
-    /* Zebra striping for logs (High Contrast - v1.5.3) */
-    .log-entry:nth-child(even) {
-      background-color: #050505;
-      /* Pitch black for even rows */
-    }
-
-    .log-entry:nth-child(odd) {
-      background-color: #161b22;
-      /* GitHub Dim Dark for odd rows */
-    }
-
-    .log-entry:hover {
-      background-color: #1f2937;
-      /* Lighter highlight */
-    }
-
-    .arrow {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      transition: transform 0.3s ease;
-    }
-
-    /* Specific Log Typography */
-    #progress-container .log-entry {
-      font-family: 'Courier New', Courier, monospace !important;
-      font-size: 0.7rem !important;
-      line-height: d1.4;
-      margin-bottom: 2px;
-      padding: 2px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-      display: flex;
-      align-items: flex-start;
-    }
-
-    /* Log Content Overflow Fix */
-    #progress-container .log-content {
-      overflow-x: hidden;
-      /* Prevent horizontal scroll */
-    }
-
-    .log-entry:last-child {
-      border-bottom: none;
-    }
-
-    .log-timestamp {
-      color: var(--text-muted);
-      margin-right: 10px;
-      font-size: 0.75rem;
-      opacity: 0.5;
-      min-width: 70px;
-      /* Align timestamps */
-    }
-
-    .log-info {
-      color: #a5b3ce;
-    }
-
-    .log-success {
-      color: #69f0ae;
-    }
-
-    .log-warning {
-      color: #ffd740;
-    }
-
-    .log-error {
-      color: #ff5252;
-    }
-
-    .log-metadata {
-      display: block;
-      margin-left: 80px;
-      /* Indent to align with message text, past timestamp */
-      margin-top: 2px;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      font-style: normal;
-      opacity: 0.7;
-    }
-
+    background-color: #050505;
+    /* Pitch black for even rows */
   }
+
+  .log-entry:nth-child(odd) {
+    background-color: #161b22;
+    /* GitHub Dim Dark for odd rows */
+  }
+
+  .log-entry:hover {
+    background-color: #1f2937;
+    /* Lighter highlight */
+  }
+
+  .arrow {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    transition: transform 0.3s ease;
+  }
+
+  /* Specific Log Typography */
+  #progress-container .log-entry {
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 0.7rem !important;
+    line-height: d1.4;
+    margin-bottom: 2px;
+    padding: 2px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    display: flex;
+    align-items: flex-start;
+  }
+
+  /* Log Content Overflow Fix */
+  #progress-container .log-content {
+    overflow-x: hidden;
+    /* Prevent horizontal scroll */
+  }
+
+  .log-entry:last-child {
+    border-bottom: none;
+  }
+
+  .log-timestamp {
+    color: var(--text-muted);
+    margin-right: 10px;
+    font-size: 0.75rem;
+    opacity: 0.5;
+    min-width: 70px;
+    /* Align timestamps */
+  }
+
+  .log-info {
+    color: #a5b3ce;
+  }
+
+  .log-success {
+    color: #69f0ae;
+  }
+
+  .log-warning {
+    color: #ffd740;
+  }
+
+  .log-error {
+    color: #ff5252;
+  }
+
+  .log-metadata {
+    display: block;
+    margin-left: 80px;
+    /* Indent to align with message text, past timestamp */
+    margin-top: 2px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-style: normal;
+    opacity: 0.7;
+  }
+
+}
