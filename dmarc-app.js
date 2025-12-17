@@ -99,7 +99,13 @@ function initializeEventListeners() {
     }
 
     // Toggle Log
+    // Toggle Log
     safeListen('log-header', 'click', toggleLog);
+    // Explicitly listen to the arrow icon too, just in case of propagation issues
+    safeListen('log-toggle-icon', 'click', (e) => {
+        e.stopPropagation();
+        toggleLog();
+    });
 
     // Global Modal Close (Click Outside & ESC)
     window.addEventListener('click', (e) => {
@@ -114,7 +120,7 @@ function initializeEventListeners() {
         }
     });
 
-    console.log('Events initialized (v1.4.8)');
+    console.log('Events initialized (v1.5.3)');
 }
 
 

@@ -5,6 +5,15 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.3] - 2025-12-17
+
+### Changed
+- **UX**: Moved "Smart Analysis" card to the bottom of the results section (after Detailed Records, before Processing Log).
+- **UI**: Refined Log styles for maximum readability:
+    - Enforced `Courier New` font.
+    - Updated zebra striping to use high-contrast dark backgrounds (`#050505` vs `#161b22`).
+- **Fix**: Added redundant click listener to the Log Toggle arrow (`▼`) to ensure reliable collapsing.
+
 ## [1.5.2] - 2025-12-17
 
 ### Fixed
@@ -215,6 +224,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.5.3]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.9...v1.5.0
