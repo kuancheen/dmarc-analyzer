@@ -83,23 +83,23 @@ function initializeEventListeners() {
             openIpModal(ip);
         }
     });
-});
 
-// Toggle Log
-document.getElementById('log-header').addEventListener('click', toggleLog);
 
-// Global Modal Close (Click Outside & ESC)
-window.addEventListener('click', (e) => {
-    if (e.target.classList.contains('modal')) {
-        e.target.classList.add('hidden');
-    }
-});
+    // Toggle Log
+    document.getElementById('log-header').addEventListener('click', toggleLog);
 
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        document.querySelectorAll('.modal').forEach(modal => modal.classList.add('hidden'));
-    }
-});
+    // Global Modal Close (Click Outside & ESC)
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            e.target.classList.add('hidden');
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal').forEach(modal => modal.classList.add('hidden'));
+        }
+    });
 }
 
 
