@@ -26,6 +26,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initializeEventListeners() {
+    // Helper for safe listening
+    const safeListen = (id, event, handler) => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener(event, handler);
+        } else {
+            console.warn(`Element with ID '${id}' not found. Event listener for '${event}' skipped.`);
+        }
+    };
+
     // Tab switching
     const tabButtons = document.querySelectorAll('.tab-button');
     tabButtons.forEach(button => {
@@ -33,60 +43,63 @@ function initializeEventListeners() {
     });
 
     // Google Drive analysis
-    document.getElementById('analyze-drive-btn').addEventListener('click', handleDriveAnalysis);
-    document.getElementById('drive-link').addEventListener('keypress', (e) => {
+    safeListen('analyze-drive-btn', 'click', handleDriveAnalysis);
+    safeListen('drive-link', 'keypress', (e) => {
         if (e.key === 'Enter') handleDriveAnalysis();
     });
 
     // Google Auth
-    document.getElementById('authorize-btn').addEventListener('click', handleAuthClick);
-    document.getElementById('settings-btn').addEventListener('click', openSettings);
-    document.getElementById('close-settings').addEventListener('click', closeSettings);
-    document.getElementById('save-settings-btn').addEventListener('click', saveSettings);
+    safeListen('authorize-btn', 'click', handleAuthClick);
+    safeListen('settings-btn', 'click', openSettings);
+    safeListen('close-settings', 'click', closeSettings);
+    safeListen('save-settings-btn', 'click', saveSettings);
 
     // File upload
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
 
-    dropZone.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', (e) => handleFileUpload(e.target.files[0]));
+    if (dropZone && fileInput) {
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFileUpload(e.target.files[0]));
 
-    // Drag and drop
-    dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('drag-over');
-    });
+        // Drag and drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
 
-    dropZone.addEventListener('dragleave', () => {
-        dropZone.classList.remove('drag-over');
-    });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
 
-    dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('drag-over');
-        const file = e.dataTransfer.files[0];
-        if (file) handleFileUpload(file);
-    });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file) handleFileUpload(file);
+        });
+    }
 
     // Export button
-    document.getElementById('export-btn').addEventListener('click', exportResults);
-
+    safeListen('export-btn', 'click', exportResults);
 
     // IP Modal Close
-    document.getElementById('close-ip-modal').addEventListener('click', closeIpModal);
+    safeListen('close-ip-modal', 'click', closeIpModal);
 
     // IP Click Delegation (Table)
-    document.querySelector('#records-table tbody').addEventListener('click', (e) => {
-        const td = e.target.closest('td');
-        if (td && td.cellIndex === 0) { // First column (IP)
-            const ip = td.textContent.trim();
-            openIpModal(ip);
-        }
-    });
-
+    const recordsTable = document.querySelector('#records-table tbody');
+    if (recordsTable) {
+        recordsTable.addEventListener('click', (e) => {
+            const td = e.target.closest('td');
+            if (td && td.cellIndex === 0) { // First column (IP)
+                const ip = td.textContent.trim();
+                openIpModal(ip);
+            }
+        });
+    }
 
     // Toggle Log
-    document.getElementById('log-header').addEventListener('click', toggleLog);
+    safeListen('log-header', 'click', toggleLog);
 
     // Global Modal Close (Click Outside & ESC)
     window.addEventListener('click', (e) => {
@@ -100,6 +113,8 @@ function initializeEventListeners() {
             document.querySelectorAll('.modal').forEach(modal => modal.classList.add('hidden'));
         }
     });
+
+    console.log('Events initialized (v1.4.8)');
 }
 
 

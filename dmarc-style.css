@@ -943,17 +943,21 @@ tbody tr:last-child td {
   }
 
   /* Specific Log Typography */
-  .log-entry {
-    font-family: 'Courier New', Courier, monospace;
-    /* User requested Courier New */
-    font-size: 0.7rem;
-    /* Smaller font */
-    line-height: 1.4;
+  #progress-container .log-entry {
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 0.7rem !important;
+    line-height: d1.4;
     margin-bottom: 2px;
     padding: 2px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
     display: flex;
     align-items: flex-start;
+  }
+
+  /* Log Content Overflow Fix */
+  #progress-container .log-content {
+    overflow-x: hidden;
+    /* Prevent horizontal scroll */
   }
 
   .log-entry:last-child {

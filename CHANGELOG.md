@@ -5,6 +5,13 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.8] - 2025-12-17
+
+### Fixed
+- **System**: Renamed core files to `dmarc-app.js` and `dmarc-style.css` to permanently resolve persistent browser caching issues.
+- **Stability**: Hardened event listener initialization with error handling to prevent the entire app from breaking if a single UI element is missing.
+- **UI**: Added `!important` flags to Log UI styles to ensure the custom font (Courier New) and sizing are correctly applied.
+
 ## [1.4.7] - 2025-12-17
 
 ### Cleanup & UI Polish
@@ -183,6 +190,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.4.8]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.7...v1.4.8
 [1.4.7]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.6...v1.4.7
 [1.4.6]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.5...v1.4.6
 [1.4.5]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.4.4...v1.4.5
