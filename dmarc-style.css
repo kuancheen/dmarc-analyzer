@@ -1022,12 +1022,18 @@ tbody tr:last-child td {
   #progress-container .log-entry {
     font-family: 'Courier New', Courier, monospace !important;
     font-size: 0.7rem !important;
-    line-height: d1.4;
+    line-height: 1.4;
     margin-bottom: 2px;
     padding: 2px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
     display: flex;
     align-items: flex-start;
+  }
+
+  /* Ensure ALL children inherit the monospace font and size */
+  #progress-container .log-entry * {
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 0.7rem !important;
   }
 
   /* Log Content Overflow Fix */
