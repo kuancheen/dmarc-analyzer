@@ -306,7 +306,8 @@ function extractDriveId(url) {
 }
 
 async function processDriveFolder(folderId) {
-    const query = `'${folderId}' in parents and (mimeType = 'application/zip' or mimeType = 'text/xml' or name contains '.xml' or name contains '.zip') and trashed = false`;
+    // mimeType = 'application/x-gzip' is often used for .gz files
+    const query = `'${folderId}' in parents and (mimeType = 'application/zip' or mimeType = 'application/x-gzip' or mimeType = 'application/gzip' or mimeType = 'text/xml' or name contains '.xml' or name contains '.zip' or name contains '.gz') and trashed = false`;
 
     let files = [];
     let pageToken = null;
@@ -332,8 +333,15 @@ async function processDriveFolder(folderId) {
     for (const file of files) {
         try {
             const fileContent = await fetchDriveFileContent(file.id);
-            const isZip = file.mimeType.includes('zip') || file.name.endsWith('.zip');
-            const fileReports = await processContent(fileContent, isZip ? 'zip' : 'xml', file.name);
+            const fileName = file.name.toLowerCase();
+            let type = 'xml';
+            if (fileName.endsWith('.zip') || file.mimeType.includes('zip') && !file.mimeType.includes('gzip')) {
+                type = 'zip';
+            } else if (fileName.endsWith('.gz') || file.mimeType.includes('gzip')) {
+                type = 'gzip';
+            }
+
+            const fileReports = await processContent(fileContent, type, file.name);
             allReports = allReports.concat(fileReports);
         } catch (e) {
             console.error(`Skipping file ${file.name}:`, e);
@@ -350,9 +358,16 @@ async function processDriveFolder(folderId) {
 
 async function processDriveFile(fileId, fileName) {
     const content = await fetchDriveFileContent(fileId);
-    const isZip = fileName.toLowerCase().endsWith('.zip');
+    const name = fileName.toLowerCase();
 
-    const reports = await processContent(content, isZip ? 'zip' : 'xml', fileName);
+    let type = 'xml';
+    if (name.endsWith('.zip')) {
+        type = 'zip';
+    } else if (name.endsWith('.gz')) {
+        type = 'gzip';
+    }
+
+    const reports = await processContent(content, type, fileName);
 
     if (reports.length === 0) {
         throw new Error('No valid reports found in file.');
@@ -390,10 +405,11 @@ async function handleFileUpload(file) {
 
     const fileName = file.name.toLowerCase();
     const isZip = fileName.endsWith('.zip');
+    const isGzip = fileName.endsWith('.gz') || fileName.endsWith('.gzip');
     const isXml = fileName.endsWith('.xml');
 
-    if (!isZip && !isXml) {
-        showError('Please upload a ZIP or XML file');
+    if (!isZip && !isXml && !isGzip) {
+        showError('Please upload a ZIP, GZIP, or XML file');
         return;
     }
 
@@ -401,7 +417,11 @@ async function handleFileUpload(file) {
     clearError();
 
     try {
-        const reports = await processContent(file, isZip ? 'zip' : 'xml', fileName);
+        let type = 'xml';
+        if (isZip) type = 'zip';
+        else if (isGzip) type = 'gzip';
+
+        const reports = await processContent(file, type, fileName);
         if (reports.length === 0) throw new Error('No valid reports found');
 
         dmarcData = reports.length === 1 ? reports[0] : mergeReports(reports);
@@ -435,6 +455,14 @@ async function processContent(input, type, sourceName) {
             const content = await zip.files[fileName].async('text');
             xmlFiles.push({ name: fileName, content });
         }
+    } else if (type === 'gzip') {
+        try {
+            const content = await decompressGzip(input);
+            xmlFiles.push({ name: sourceName, content });
+        } catch (e) {
+            console.error('GZIP Decompression failed:', e);
+            throw new Error(`Failed to decompress GZIP file: ${sourceName}`);
+        }
     } else {
         // Direct XML file
         let content;
@@ -457,6 +485,17 @@ async function processContent(input, type, sourceName) {
     }
 
     return reports;
+}
+
+async function decompressGzip(blob) {
+    // Check for DecompressionStream support
+    if ('DecompressionStream' in window) {
+        const ds = new DecompressionStream('gzip');
+        const stream = blob.stream().pipeThrough(ds);
+        return new Response(stream).text();
+    } else {
+        throw new Error('GZIP decompression is not supported in this browser. Please use a modern browser (Chrome, Edge, Safari, Firefox).');
+    }
 }
 
 /* ===================================
