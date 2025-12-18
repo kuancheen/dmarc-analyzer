@@ -5,6 +5,13 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.5] - 2025-12-18
+
+### Added
+- **Multi-File Upload Support**: You can now select multiple files (ZIP, XML, or GZIP) in the file picker or drop multiple files simultaneously into the drop zone.
+- **Aggregated Processing**: The app will loop through all selected files, parse them sequentially, and automatically merge all found DMARC reports into a single, comprehensive view.
+- **Step-by-Step Logging**: The Processing Log now tracks progress per file (e.g., "Reading file 1/5...") for better clarity when handling batch uploads.
+
 ## [1.6.4] - 2025-12-18
 
 ### Added
@@ -299,6 +306,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.6.5]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.6.4...v1.6.5
 [1.6.4]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.6.3...v1.6.4
 [1.6.3]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.6.1...v1.6.2

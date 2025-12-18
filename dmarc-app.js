@@ -60,7 +60,7 @@ function initializeEventListeners() {
 
     if (dropZone && fileInput) {
         dropZone.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (e) => handleFileUpload(e.target.files[0]));
+        fileInput.addEventListener('change', (e) => handleFileUpload(e.target.files));
 
         // Drag and drop
         dropZone.addEventListener('dragover', (e) => {
@@ -75,8 +75,9 @@ function initializeEventListeners() {
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('drag-over');
-            const file = e.dataTransfer.files[0];
-            if (file) handleFileUpload(file);
+            if (e.dataTransfer.files.length > 0) {
+                handleFileUpload(e.dataTransfer.files);
+            }
         });
     }
 
@@ -472,52 +473,60 @@ async function fetchDriveFileContent(fileId) {
    File Upload Handling
    =================================== */
 
-async function handleFileUpload(file) {
-    if (!file) return;
+async function readFileAsArrayBuffer(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = (e) => reject(new Error('Failed to read file'));
+        reader.readAsArrayBuffer(file);
+    });
+}
 
-    const fileName = file.name.toLowerCase();
-    const isZip = fileName.endsWith('.zip');
-    const isGzip = fileName.endsWith('.gz') || fileName.endsWith('.gzip');
-    const isXml = fileName.endsWith('.xml');
+async function handleFileUpload(fileList) {
+    if (!fileList || fileList.length === 0) return;
 
-    if (!isZip && !isXml && !isGzip) {
-        showError('Please upload a ZIP, GZIP, or XML file');
-        return;
-    }
+    const files = Array.from(fileList);
+    let allReports = [];
 
-    // Reset UI: Hide results, show log, force repaint IMMEDIATELY
-    // This ensures feedback is shown even while large files are read into memory
+    // Reset UI
     await resetUIForAnalysis();
     clearError();
     clearLog();
-    addLog(`Reading file: ${fileName}...`); // Show log before read starts
 
-    const reader = new FileReader();
+    try {
+        for (const [index, file] of files.entries()) {
+            const fileName = file.name;
+            const lowerName = fileName.toLowerCase();
+            const isZip = lowerName.endsWith('.zip');
+            const isGzip = lowerName.endsWith('.gz') || lowerName.endsWith('.gzip');
+            const isXml = lowerName.endsWith('.xml');
 
-    reader.onload = async function (e) {
-        try {
-            addLog(`Analyzing content...`);
-            // Force repaint again just in case
-            await new Promise(r => setTimeout(r, 50));
+            if (!isZip && !isXml && !isGzip) {
+                addLog(`Skipped unsupported file: ${fileName}`, 'warning');
+                continue;
+            }
 
-            const reports = await processContent(e.target.result, isZip ? 'zip' : (isGzip ? 'gzip' : 'xml'), file.name);
+            addLog(`Reading file ${index + 1}/${files.length}: ${fileName}...`);
+            const content = await readFileAsArrayBuffer(file);
 
-            if (reports.length === 0) throw new Error('No valid reports found.');
-            dmarcData = reports.length === 1 ? reports[0] : mergeReports(reports);
-
-            // Show success feedback
-            showUploadStatus(`Successfully processed "${file.name}"`, 'success');
-
-            displayResults(dmarcData);
-        } catch (error) {
-            console.error('File Processing Error:', error);
-            showError(`Error processing file: ${error.message}`);
-        } finally {
-            setLogState(true, true); // visible=true, collapsed=true
+            addLog(`Analyzing ${fileName}...`);
+            const reports = await processContent(content, isZip ? 'zip' : (isGzip ? 'gzip' : 'xml'), fileName);
+            allReports = allReports.concat(reports);
         }
-    };
 
-    reader.readAsArrayBuffer(file); // Read as ArrayBuffer for JSZip/Gzip
+        if (allReports.length === 0) throw new Error('No valid DMARC reports found in uploaded files.');
+
+        dmarcData = allReports.length === 1 ? allReports[0] : mergeReports(allReports);
+
+        showUploadStatus(`Successfully processed ${files.length} file(s)`, 'success');
+        displayResults(dmarcData);
+
+    } catch (error) {
+        console.error('Multi-File Processing Error:', error);
+        showError(`Error processing files: ${error.message}`);
+    } finally {
+        setLogState(true, true); // visible=true, collapsed=true
+    }
 }
 
 
