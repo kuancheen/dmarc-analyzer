@@ -5,6 +5,12 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.6] - 2025-12-18
+
+### Fixed
+- **XML Parsing Bug**: Resolved an issue where direct XML uploads (non-ZIP) were incorrectly handled as `ArrayBuffer` objects during parsing, leading to "Invalid XML format" errors.
+- **Improved Data Extraction**: Corrected the XML tag paths for metadata (Begin/End dates) and record details to ensure full compatibility with standard DMARC report structures (RFC 7489).
+
 ## [1.6.5] - 2025-12-18
 
 ### Added
@@ -306,6 +312,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.6.6]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.6.5...v1.6.6
 [1.6.5]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.6.4...v1.6.5
 [1.6.4]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.6.3...v1.6.4
 [1.6.3]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.6.2...v1.6.3

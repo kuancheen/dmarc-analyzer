@@ -573,6 +573,8 @@ async function processContent(input, type, sourceName) {
         let content;
         if (input instanceof Blob) {
             content = await input.text();
+        } else if (input instanceof ArrayBuffer) {
+            content = new TextDecoder().decode(input);
         } else {
             content = input; // Assume string
         }
@@ -635,8 +637,8 @@ function parseDmarcXml(xmlString) {
         orgName: getXmlValue(xmlDoc, 'org_name') || 'Unknown Org',
         email: getXmlValue(xmlDoc, 'email'),
         reportId: getXmlValue(xmlDoc, 'report_id'),
-        dateBegin: parseSafeDate(getXmlValue(xmlDoc, 'date_begin')),
-        dateEnd: parseSafeDate(getXmlValue(xmlDoc, 'date_end'))
+        dateBegin: parseSafeDate(getXmlValue(xmlDoc, 'date_range begin')),
+        dateEnd: parseSafeDate(getXmlValue(xmlDoc, 'date_range end'))
     };
 
     const policy = {
@@ -654,9 +656,9 @@ function parseDmarcXml(xmlString) {
             sourceIp: getXmlValue(record, 'source_ip'),
             count: parseInt(getXmlValue(record, 'count')) || 0,
             policyEvaluated: {
-                disposition: getXmlValue(record, 'policy_evaluated disposition'),
-                dkim: getXmlValue(record, 'policy_evaluated dkim'),
-                spf: getXmlValue(record, 'policy_evaluated spf')
+                disposition: getXmlValue(record, 'disposition'),
+                dkim: getXmlValue(record, 'dkim'),
+                spf: getXmlValue(record, 'spf')
             },
             authResults: {
                 spfDomain: getXmlValue(record, 'auth_results spf domain'),
