@@ -1085,26 +1085,28 @@ function clearError() {
 }
 
 function clearLog() {
-    const log = document.getElementById('loading'); // ID reused for log content to minimize change, no, wait... 
-    // In index.html step, I renamed the content div to id="loading" class="log-content". 
-    // And duplicate id="loading" was removed from top. 
-    // So "loading" is now the log content container. Correct.
+    const log = document.getElementById('log-entries');
     if (log) log.innerHTML = '';
 }
 
 function addLog(message, type = 'info', link = null, linkText = 'Open Source') {
-    const logContainer = document.getElementById('loading');
+    const logContainer = document.getElementById('log-entries');
     if (!logContainer) return;
 
     const entry = document.createElement('div');
     entry.className = `log-entry log-${type}`;
 
+    // NUCLEAR FONT FIX: Force inline style to ensure consistency
+    entry.style.fontFamily = "'Courier New', Courier, monospace";
+    entry.style.fontSize = "0.7rem";
+    entry.style.lineHeight = "1.4";
+
     const timestamp = new Date().toLocaleTimeString([], { hour12: false });
 
-    let content = `<span class="log-timestamp">[${timestamp}]</span> <span class="log-message">${message}</span>`;
+    let content = `<span class="log-timestamp" style="font-size:0.7rem !important;">[${timestamp}]</span> <span class="log-message" style="font-size:0.7rem !important;">${message}</span>`;
 
     if (link) {
-        content += ` <a href="${link}" target="_blank" class="log-link">${linkText} ↗</a>`;
+        content += ` <a href="${link}" target="_blank" class="log-link" style="font-size:0.7rem !important;">${linkText} ↗</a>`;
     }
 
     entry.innerHTML = content;

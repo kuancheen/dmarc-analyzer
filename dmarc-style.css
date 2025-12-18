@@ -949,14 +949,9 @@ tbody tr:last-child td {
 }
 
 /* ===================================
-   Progress Log
+   Progress Log (Fixed v1.6.2)
    =================================== */
 
-/* ===================================
-   Progress Log
-   =================================== */
-
-/* Use ID directly as it's the main container */
 #progress-container {
   margin-top: var(--spacing-md);
   transition: all var(--transition-normal);
@@ -967,7 +962,6 @@ tbody tr:last-child td {
   justify-content: space-between;
   align-items: center;
   background: rgba(255, 255, 255, 0.05);
-  /* Slight highlight */
 }
 
 #progress-container .card-header:hover {
@@ -979,12 +973,11 @@ tbody tr:last-child td {
   overflow-y: auto;
   padding: var(--spacing-md);
   background: #0d1117;
-  /* Very dark terminal-like background */
   transition: max-height 0.3s ease-in-out, padding 0.3s ease, opacity 0.3s ease;
   opacity: 1;
+  overflow-x: hidden;
 }
 
-/* Collapsed State Logic */
 #progress-container.collapsed .log-content {
   max-height: 0;
   padding-top: 0 !important;
@@ -993,122 +986,99 @@ tbody tr:last-child td {
   overflow: hidden;
 }
 
-/* Zebra striping for logs (High Contrast) */
-.log-entry:nth-child(even) {
+/* Zebra striping for logs (Standalone rules) */
+#progress-container .log-entry:nth-of-type(even) {
+  background-color: #050505;
+}
 
-  /* Zebra striping for logs (High Contrast - v1.5.3) */
-  /* Zebra striping for logs (High Contrast - v1.5.6) */
-  /* Zebra striping for logs (Every row - v1.6.1) */
-  #progress-container .log-entry:nth-of-type(even) {
-    background-color: #050505;
-    /* Pitch black for even rows */
-  }
+#progress-container .log-entry:nth-of-type(odd) {
+  background-color: #161b22;
+}
 
-  #progress-container .log-entry:nth-of-type(odd) {
-    background-color: #161b22;
-    /* GitHub Dim Dark for odd rows */
-  }
+#progress-container .log-entry:hover {
+  background-color: #1f2937;
+}
 
-  #progress-container .log-entry:hover {
-    background-color: #1f2937;
-    /* Lighter highlight */
-  }
+/* Typography Consistency (Strict v1.6.2) */
+#progress-container .log-entry,
+#progress-container .log-entry * {
+  font-family: 'Courier New', Courier, monospace !important;
+  font-size: 0.7rem !important;
+  line-height: 1.4;
+}
 
-  .arrow {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    transition: transform 0.3s ease;
-  }
+#progress-container .log-entry {
+  margin-bottom: 2px;
+  padding: 4px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  display: flex;
+  align-items: flex-start;
+  min-height: 1.4rem;
+}
 
-  /* Specific Log Typography */
-  #progress-container .log-entry {
-    font-family: 'Courier New', Courier, monospace !important;
-    font-size: 0.7rem !important;
-    line-height: 1.4;
-    margin-bottom: 2px;
-    padding: 2px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-    display: flex;
-    align-items: flex-start;
-  }
+#progress-container .log-entry:last-child {
+  border-bottom: none;
+}
 
-  /* Ensure ALL children inherit the monospace font and size */
-  #progress-container .log-entry * {
-    font-family: 'Courier New', Courier, monospace !important;
-    font-size: 0.7rem !important;
-  }
+.log-timestamp {
+  color: var(--text-muted);
+  margin-right: 12px;
+  opacity: 0.5;
+  min-width: 75px;
+  white-space: nowrap;
+}
 
-  /* Log Content Overflow Fix */
-  #progress-container .log-content {
-    overflow-x: hidden;
-    /* Prevent horizontal scroll */
-  }
+.log-message {
+  flex: 1;
+}
 
-  .log-entry:last-child {
-    border-bottom: none;
-  }
+.log-info {
+  color: #a5b3ce;
+}
 
-  .log-timestamp {
-    color: var(--text-muted);
-    margin-right: 10px;
-    font-size: 0.7rem !important;
-    /* Enforce same size as log entry */
-    opacity: 0.5;
-    min-width: 70px;
-    /* Align timestamps */
-  }
+.log-success {
+  color: #69f0ae;
+}
 
-  .log-info {
-    color: #a5b3ce;
-  }
+.log-warning {
+  color: #ffd740;
+}
 
-  .log-metadata {
-    color: #ffd740;
-    /* Golden for metadata */
-  }
+.log-error {
+  color: #ff5252;
+}
 
-  .log-success {
-    color: #69f0ae;
-  }
+.log-metadata {
+  color: #ffd740;
+  opacity: 0.9;
+}
 
-  .log-warning {
-    color: #ffd740;
-  }
+.log-meta-tag {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffd740;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.6rem !important;
+  margin-right: 4px;
+  vertical-align: middle;
+}
 
-  .log-error {
-    color: #ff5252;
-  }
+.log-link {
+  color: #64ffda;
+  text-decoration: none;
+  margin-left: 10px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
 
-  .log-metadata {
-    display: inline;
-    /* Changed from block to inline for 1.6.1 */
-    font-size: 0.7rem !important;
-    color: var(--text-muted);
-    font-style: normal;
-    opacity: 0.9;
-  }
+.log-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
 
-  .log-meta-tag {
-    background: rgba(255, 255, 255, 0.1);
-    color: #ffd740;
-    padding: 1px 4px;
-    border-radius: 3px;
-    font-size: 0.6rem !important;
-    margin-right: 4px;
-    vertical-align: middle;
-  }
-
-  .log-link {
-    color: #64ffda;
-    text-decoration: none;
-    margin-left: 10px;
-    opacity: 0.8;
-    transition: opacity 0.2s;
-  }
-
-  .log-link:hover {
-    opacity: 1;
-    text-decoration: underline;
-  }
-
+.arrow {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  transition: transform 0.3s ease;
 }
