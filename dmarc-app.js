@@ -502,7 +502,7 @@ async function handleFileUpload(fileList) {
             const isXml = lowerName.endsWith('.xml');
 
             if (!isZip && !isXml && !isGzip) {
-                addLog(`Skipped unsupported file: ${fileName}`, 'warning');
+                addLog(`Skipped unsupported file: ${fileName}`, 'error');
                 continue;
             }
 
