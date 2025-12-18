@@ -5,6 +5,13 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.2] - 2025-12-18
+
+### Fixed
+- **Critical CSS Fix**: Resolved a syntax error where log entry styles were nested inside a non-standard block, causing alternating font sizes (fallback vs specific rule) and inconsistent styling when toggling the log state.
+- **UI**: Flattened and consolidated the Progress Log CSS for better reliability and cross-browser consistency.
+- **UI**: Enforced strict `Courier New` and `0.7rem` font across all log elements, including timestamps and metadata.
+
 ## [1.6.1] - 2025-12-18
 
 ### Added
@@ -279,6 +286,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.6.2]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.9...v1.6.0
 [1.5.9]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.5.8...v1.5.9
