@@ -361,7 +361,7 @@ function extractDriveId(url) {
 }
 
 async function processDriveFolder(folderId) {
-    addLog(`Scanning folder ID: ${folderId}...`);
+    addLog(`Scanning folder: ${folderId}...`, 'info', `https://drive.google.com/drive/folders/${folderId}`);
     // mimeType = 'application/x-gzip' is often used for .gz files
     const query = `'${folderId}' in parents and (mimeType = 'application/zip' or mimeType = 'application/x-gzip' or mimeType = 'application/gzip' or mimeType = 'text/xml' or name contains '.xml' or name contains '.zip' or name contains '.gz') and trashed = false`;
 
@@ -393,17 +393,20 @@ async function processDriveFolder(folderId) {
 
     for (const [index, file] of files.entries()) {
         try {
-            addLog(`Processing file ${index + 1}/${files.length}: ${file.name} (${file.mimeType})`);
+            const fileName = file.name;
+            const driveUrl = `https://drive.google.com/file/d/${file.id}/view`;
+            addLog(`Processing file ${index + 1}/${files.length}: ${fileName}`, 'info', driveUrl);
+
             const fileContent = await fetchDriveFileContent(file.id);
-            const fileName = file.name.toLowerCase();
+            const lowerName = fileName.toLowerCase();
             let type = 'xml';
-            if (fileName.endsWith('.zip') || file.mimeType.includes('zip') && !file.mimeType.includes('gzip')) {
+            if (lowerName.endsWith('.zip') || file.mimeType.includes('zip') && !file.mimeType.includes('gzip')) {
                 type = 'zip';
-            } else if (fileName.endsWith('.gz') || file.mimeType.includes('gzip')) {
+            } else if (lowerName.endsWith('.gz') || file.mimeType.includes('gzip')) {
                 type = 'gzip';
             }
 
-            const fileReports = await processContent(fileContent, type, file.name);
+            const fileReports = await processContent(fileContent, type, fileName);
             allReports = allReports.concat(fileReports);
         } catch (e) {
             console.error(`Skipping file ${file.name}:`, e);
@@ -420,7 +423,8 @@ async function processDriveFolder(folderId) {
 }
 
 async function processDriveFile(fileId, fileName) {
-    addLog(`Fetching single file: ${fileName}...`);
+    const driveUrl = `https://drive.google.com/file/d/${fileId}/view`;
+    addLog(`Fetching single file: ${fileName}...`, 'info', driveUrl);
     const content = await fetchDriveFileContent(fileId);
     const name = fileName.toLowerCase();
 
@@ -565,10 +569,18 @@ async function processContent(input, type, sourceName) {
             const report = parseDmarcXml(xmlFile.content);
             reports.push(report);
 
-            // LOGGING METADATA AS REQUESTED
+            // Create a Blob URL for the XML content so the user can open it
+            const xmlBlob = new Blob([xmlFile.content], { type: 'text/xml' });
+            const memoryUrl = URL.createObjectURL(xmlBlob);
+
+            // LOGGING ACTIONS
+            addLog(`Extracted: ${xmlFile.name}`, 'success', memoryUrl, 'View XML');
+
+            // LOGGING METADATA AS A DISTINCT ROW
             const meta = report.metadata;
             const dateRange = `${meta.dateBegin.toLocaleDateString()} - ${meta.dateEnd.toLocaleDateString()}`;
-            addLog(`Parsed: ${xmlFile.name}<br><span class="log-metadata">Org: ${meta.orgName} | ID: ${meta.reportId} | Period: ${dateRange}</span>`, 'success');
+            const metadataMessage = `<span class="log-meta-tag">ORG</span> <strong>${meta.orgName}</strong> | <span class="log-meta-tag">ID</span> ${meta.reportId} | <span class="log-meta-tag">PERIOD</span> ${dateRange}`;
+            addLog(metadataMessage, 'metadata');
 
         } catch (error) {
             console.error(`Error parsing ${xmlFile.name}:`, error);
@@ -1080,17 +1092,25 @@ function clearLog() {
     if (log) log.innerHTML = '';
 }
 
-function addLog(message, type = 'info') {
-    const logContainer = document.getElementById('loading'); // "loading" is indeed the content div now
+function addLog(message, type = 'info', link = null, linkText = 'Open Source') {
+    const logContainer = document.getElementById('loading');
     if (!logContainer) return;
+
     const entry = document.createElement('div');
     entry.className = `log-entry log-${type}`;
+
     const timestamp = new Date().toLocaleTimeString([], { hour12: false });
-    entry.innerHTML = `<span class="log-timestamp">[${timestamp}]</span> ${message}`;
+
+    let content = `<span class="log-timestamp">[${timestamp}]</span> <span class="log-message">${message}</span>`;
+
+    if (link) {
+        content += ` <a href="${link}" target="_blank" class="log-link">${linkText} ↗</a>`;
+    }
+
+    entry.innerHTML = content;
 
     // User requested reverse order (newest on top)
     logContainer.prepend(entry);
-    // No need to scroll to bottom since we are prepending to top
     logContainer.scrollTop = 0;
 }
 

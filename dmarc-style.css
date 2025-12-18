@@ -998,12 +998,13 @@ tbody tr:last-child td {
 
   /* Zebra striping for logs (High Contrast - v1.5.3) */
   /* Zebra striping for logs (High Contrast - v1.5.6) */
-  #progress-container .log-entry:nth-child(even) {
+  /* Zebra striping for logs (Every row - v1.6.1) */
+  #progress-container .log-entry:nth-of-type(even) {
     background-color: #050505;
     /* Pitch black for even rows */
   }
 
-  #progress-container .log-entry:nth-child(odd) {
+  #progress-container .log-entry:nth-of-type(odd) {
     background-color: #161b22;
     /* GitHub Dim Dark for odd rows */
   }
@@ -1061,6 +1062,11 @@ tbody tr:last-child td {
     color: #a5b3ce;
   }
 
+  .log-metadata {
+    color: #ffd740;
+    /* Golden for metadata */
+  }
+
   .log-success {
     color: #69f0ae;
   }
@@ -1074,15 +1080,35 @@ tbody tr:last-child td {
   }
 
   .log-metadata {
-    display: block;
-    margin-left: 80px;
-    /* Indent to align with message text, past timestamp */
-    margin-top: 2px;
+    display: inline;
+    /* Changed from block to inline for 1.6.1 */
     font-size: 0.7rem !important;
-    /* Enforce same size */
     color: var(--text-muted);
     font-style: normal;
-    opacity: 0.7;
+    opacity: 0.9;
+  }
+
+  .log-meta-tag {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffd740;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 0.6rem !important;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+
+  .log-link {
+    color: #64ffda;
+    text-decoration: none;
+    margin-left: 10px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+  }
+
+  .log-link:hover {
+    opacity: 1;
+    text-decoration: underline;
   }
 
 }
