@@ -284,6 +284,9 @@ function switchTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.toggle('active', content.id === `${tabName}-tab`);
     });
+
+    // Clear upload status when switching tabs
+    showUploadStatus('', 'success', true);
 }
 
 /* ===================================
@@ -501,6 +504,10 @@ async function handleFileUpload(file) {
 
             if (reports.length === 0) throw new Error('No valid reports found.');
             dmarcData = reports.length === 1 ? reports[0] : mergeReports(reports);
+
+            // Show success feedback
+            showUploadStatus(`Successfully processed "${file.name}"`, 'success');
+
             displayResults(dmarcData);
         } catch (error) {
             console.error('File Processing Error:', error);
@@ -1084,6 +1091,20 @@ function clearError() {
     document.getElementById('error-container').innerHTML = '';
 }
 
+function showUploadStatus(message, type = 'success', hide = false) {
+    const el = document.getElementById('upload-status');
+    if (!el) return;
+
+    if (hide || !message) {
+        el.classList.add('hidden');
+        return;
+    }
+
+    el.textContent = `✅ ${message}`;
+    el.className = `message message-${type}`;
+    el.classList.remove('hidden');
+}
+
 function clearLog() {
     const log = document.getElementById('log-entries');
     if (log) log.innerHTML = '';
@@ -1150,6 +1171,9 @@ async function resetUIForAnalysis() {
         const arrow = document.getElementById('log-toggle-icon');
         if (arrow) arrow.style.transform = 'rotate(0deg)';
     }
+
+    // Clear upload status
+    showUploadStatus('', 'success', true);
 
     // Force browser repaint (yield to main thread)
     await new Promise(resolve => setTimeout(resolve, 50));
