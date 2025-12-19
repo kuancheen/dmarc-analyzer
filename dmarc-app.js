@@ -11,6 +11,7 @@ let tokenClient;
 let gapiInited = false;
 let gisInited = false;
 let accessToken = null;
+let selectedDriveFilter = 'latest'; // Default filter
 
 const SCOPES = 'https://www.googleapis.com/auth/drive.readonly';
 const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
@@ -121,7 +122,18 @@ function initializeEventListeners() {
         }
     });
 
-    console.log('Events initialized (v1.5.3)');
+    // Drive Date Filters
+    const driveFilters = document.querySelectorAll('#drive-date-filters .filter-btn');
+    driveFilters.forEach(btn => {
+        btn.addEventListener('click', () => {
+            driveFilters.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedDriveFilter = btn.dataset.filter;
+            console.log(`Drive Filter switched to: ${selectedDriveFilter}`);
+        });
+    });
+
+    console.log('Events initialized (v1.7.0)');
 }
 
 
@@ -375,11 +387,12 @@ async function processDriveFolder(folderId) {
     do {
         const response = await gapi.client.drive.files.list({
             q: query,
-            fields: 'nextPageToken, files(id, name, mimeType)',
+            fields: 'nextPageToken, files(id, name, mimeType, createdTime)',
             spaces: 'drive',
             pageToken: pageToken,
             supportsAllDrives: true,
-            includeItemsFromAllDrives: true
+            includeItemsFromAllDrives: true,
+            orderBy: 'createdTime desc' // Important for "Latest" logic
         });
 
         addLog(`Found ${response.result.files.length} potential files in this batch...`);
@@ -392,10 +405,35 @@ async function processDriveFolder(folderId) {
         throw new Error('No ZIP or XML files found in this folder.');
     }
 
-    addLog(`Total files to process: ${files.length}`);
+    // APPLY FILTERING LOGIC
+    let filteredFiles = files;
+    if (selectedDriveFilter !== 'all' && files.length > 0) {
+        const latestFile = files[0]; // orderBy: createdTime desc ensures this
+        const latestDate = new Date(latestFile.createdTime);
+        
+        addLog(`Applying "${selectedDriveFilter}" filter relative to newest file (${latestFile.name} - ${latestDate.toLocaleDateString()})...`);
+
+        if (selectedDriveFilter === 'latest') {
+            // All files on the SAME calendar day as the latest file
+            const latestDayStr = latestDate.toDateString();
+            filteredFiles = files.filter(f => new Date(f.createdTime).toDateString() === latestDayStr);
+        } else if (selectedDriveFilter === '7days') {
+            const sevenDaysAgo = new Date(latestDate);
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+            filteredFiles = files.filter(f => new Date(f.createdTime) >= sevenDaysAgo);
+        } else if (selectedDriveFilter === '30days') {
+            const thirtyDaysAgo = new Date(latestDate);
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            filteredFiles = files.filter(f => new Date(f.createdTime) >= thirtyDaysAgo);
+        }
+        
+        addLog(`Filter applied: ${filteredFiles.length} file(s) kept, ${files.length - filteredFiles.length} skipped.`);
+    }
+
+    addLog(`Total files to process: ${filteredFiles.length}`);
     let allReports = [];
 
-    for (const [index, file] of files.entries()) {
+    for (const [index, file] of filteredFiles.entries()) {
         try {
             const fileName = file.name;
             const driveUrl = `https://drive.google.com/file/d/${file.id}/view`;

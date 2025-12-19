@@ -27,7 +27,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="dmarc-style.css?v=1.6.8">
+    <link rel="stylesheet" href="dmarc-style.css?v=1.7.0">
 
     <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -80,6 +80,15 @@
 
                         <!-- Drive Input Section -->
                         <div id="drive-input-section">
+                            <div class="filter-section">
+                                <label class="filter-label">📅 Filter by Date:</label>
+                                <div class="filter-btn-group" id="drive-date-filters">
+                                    <button class="filter-btn active" data-filter="latest">Latest</button>
+                                    <button class="filter-btn" data-filter="7days">7 Days</button>
+                                    <button class="filter-btn" data-filter="30days">30 Days</button>
+                                    <button class="filter-btn" data-filter="all">All</button>
+                                </div>
+                            </div>
                             <div class="input-group">
                                 <input type="text" id="drive-link" class="input-field"
                                     placeholder="Paste Google Drive link (File or Folder)">
@@ -226,7 +235,7 @@
         <!-- Footer -->
         <footer class="footer">
             <p>
-                DMARC Report Analyzer v1.6.8 |
+                DMARC Report Analyzer v1.7.0 |
                 <a href="https://github.com" target="_blank">GitHub</a> |
                 100% Client-Side Processing - Your data never leaves your browser
             </p>
@@ -236,7 +245,7 @@
         </footer>
 
         <!-- Application JavaScript -->
-        <script src="dmarc-app.js?v=1.6.8"></script>
+        <script src="dmarc-app.js?v=1.7.0"></script>
         <!-- Settings Modal -->
         <div id="settings-modal" class="modal hidden">
             <div class="modal-content card">
