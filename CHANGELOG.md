@@ -5,6 +5,11 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.1] - 2025-12-19
+
+### Fixed
+- **Documentation**: Linked the "Live Demo" badge in `README.md` to the live site URL for easier access.
+
 ## [1.7.0] - 2025-12-19
 
 ### Added
@@ -336,6 +341,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.7.1]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.6.8...v1.7.0
 [1.6.8]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.6.7...v1.6.8
 [1.6.7]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.6.6...v1.6.7

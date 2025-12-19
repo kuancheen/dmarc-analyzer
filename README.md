@@ -2,12 +2,12 @@
 
 A beautiful, privacy-focused web application for analyzing DMARC (Domain-based Message Authentication, Reporting & Conformance) reports. Parse email authentication data from Google Drive links or direct file uploads and gain actionable insights with stunning visualizations.
 
-![Version](https://img.shields.io/badge/version-1.7.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.7.1-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Privacy](https://img.shields.io/badge/privacy-100%25%20client--side-success.svg)
 ![Semantic Versioning](https://img.shields.io/badge/semver-2.0.0-blue)
 ![Status](https://img.shields.io/badge/status-active-success)
-![Live Demo](https://img.shields.io/badge/demo-online-green.svg)
+[![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://kuancheen.github.io/dmarc-analyzer/)
 
 ## ✨ Features
 
