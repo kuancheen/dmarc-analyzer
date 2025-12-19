@@ -5,6 +5,17 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.8] - 2025-12-19
+
+### Changed
+- **Compliance Audit**: Standardized project structure and documentation according to `new-project-init` workflow.
+- **Documentation**: Added missing Semantic Versioning, Status, and Live Demo badges to `README.md`.
+- **UI/UX**: Added mandatory HTML Comment Header to `index.html` and updated application branding.
+
+### Added
+- **Automation**: Implemented local `.agent/workflows/version-update.md` for standardized versioning.
+- **CI/CD**: Added `.github/workflows/static.yml` for automated GitHub Pages deployment.
+
 ## [1.6.7] - 2025-12-18
 
 ### Changed
@@ -317,6 +328,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.6.8]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.6.7...v1.6.8
 [1.6.7]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.6.6...v1.6.7
 [1.6.6]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.6.5...v1.6.6
 [1.6.5]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.6.4...v1.6.5
