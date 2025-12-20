@@ -5,6 +5,19 @@ All notable changes to the DMARC Report Analyzer project will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2025-12-20
+
+### Added
+- **Official Release**: Project has moved out of beta to v1.0.0.
+- **Drive Date Filtering**: Users can now filter Google Drive folder results by date (Latest, 7 Days, 30 Days).
+- **Batch Processing**: Simultaneous processing for multiple file uploads.
+- **Hits.sh Integration**: Added view counter badges to footer and README.
+- **MD Viewer Integration**: Documentation links (README, CHANGELOG) now open in [MD Viewer](https://kuancheen.github.io/md-viewer/).
+
+### Changed
+- **UI/UX**: Refined footer layout and standardized badge styles.
+- **Styling**: Switched footer Hits.sh badge to `flat-square` and README badge to `flat`.
+
 ## [1.7.4] - 2025-12-20
 
 ### Added
@@ -357,6 +370,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All processing happens in the browser
 - Works offline after initial load
 
+[1.0.0]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.7.4...v1.0.0
 [1.7.4]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.7.3...v1.7.4
 [1.7.3]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.7.2...v1.7.3
 [1.7.2]: https://github.com/kuancheen/dmarc-analyzer/compare/v1.7.1...v1.7.2
