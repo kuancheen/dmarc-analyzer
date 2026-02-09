@@ -1,14 +1,20 @@
-# DMARC Report Analyzer
+# DMARC Report Analyzer (v1.0.1)
 
 A beautiful, privacy-focused web application for analyzing DMARC (Domain-based Message Authentication, Reporting & Conformance) reports. Parse email authentication data from Google Drive links or direct file uploads and gain actionable insights with stunning visualizations.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Version](https://img.shields.io/badge/version-1.0.1-green.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Privacy](https://img.shields.io/badge/privacy-100%25%20client--side-success.svg)
 ![Semantic Versioning](https://img.shields.io/badge/semver-2.0.0-blue)
 ![Status](https://img.shields.io/badge/status-active-success)
-[![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://kuancheen.github.io/dmarc-analyzer/)
+[![Live Demo](https://img.shields.io/badge/demo-live-success.svg)](https://kuancheen.github.io/dmarc-analyzer/)
 [![Hits](https://hits.sh/kuancheen.github.io/dmarc-analyzer.svg?view=today-total&style=flat&label=👁️%20Views&extraCount=0&color=6366f1)](https://hits.sh/kuancheen.github.io/dmarc-analyzer/)
+
+---
+
+### Copyright
+
+**Copyright (c) 2025-2026 Kuan Cheen Lim**
 
 ## ✨ Features
 

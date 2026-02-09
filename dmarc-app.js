@@ -410,7 +410,7 @@ async function processDriveFolder(folderId) {
     if (selectedDriveFilter !== 'all' && files.length > 0) {
         const latestFile = files[0]; // orderBy: createdTime desc ensures this
         const latestDate = new Date(latestFile.createdTime);
-        
+
         addLog(`Applying "${selectedDriveFilter}" filter relative to newest file (${latestFile.name} - ${latestDate.toLocaleDateString()})...`);
 
         if (selectedDriveFilter === 'latest') {
@@ -426,7 +426,7 @@ async function processDriveFolder(folderId) {
             thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
             filteredFiles = files.filter(f => new Date(f.createdTime) >= thirtyDaysAgo);
         }
-        
+
         addLog(`Filter applied: ${filteredFiles.length} file(s) kept, ${files.length - filteredFiles.length} skipped.`);
     }
 
@@ -648,15 +648,35 @@ async function processContent(input, type, sourceName) {
     return reports;
 }
 
-async function decompressGzip(blob) {
+async function decompressGzip(input) {
     // Check for DecompressionStream support
     if ('DecompressionStream' in window) {
+        // Fix: Ensure input is a Blob. Local transfers often send ArrayBuffer.
+        const blob = input instanceof Blob ? input : new Blob([input]);
+
         const ds = new DecompressionStream('gzip');
         const stream = blob.stream().pipeThrough(ds);
         return new Response(stream).text();
     } else {
         throw new Error('GZIP decompression is not supported in this browser. Please use a modern browser (Chrome, Edge, Safari, Firefox).');
     }
+}
+
+function showError(message) {
+    const container = document.getElementById('error-container');
+    if (!container) return;
+
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'message message-error';
+    errorDiv.style.marginTop = '1rem';
+    errorDiv.innerHTML = `<strong>Error:</strong> ${message}`;
+
+    // Clear previous errors or append? User request usually implies showing the latest.
+    container.innerHTML = '';
+    container.appendChild(errorDiv);
+
+    // Auto-scroll to error
+    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 /* ===================================
