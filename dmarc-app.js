@@ -133,7 +133,7 @@ function initializeEventListeners() {
         });
     });
 
-    console.log('Events initialized (v1.7.0)');
+    console.log('Events initialized (v1.0.1)');
 }
 
 
